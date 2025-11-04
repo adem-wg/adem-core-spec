@@ -203,10 +203,10 @@ All other registered JWT claims MUST NOT be included.
 | `nbf` | REQUIRED | As per {{!RFC7519}} | |
 | `exp` | REQUIRED | As per {{!RFC7519}} | |
 | `iss` | RECOMMENDED | Organization signaling protection | OI |
-| `sub` | REQUIRED | BIs marked a protected | Array of BIs |
+| `bearers` | REQUIRED | BIs marked a protected | Array of BIs |
 | `emb` | REQUIRED | Emblem details | JSON object (as follows) |
 
-Multiple BIs within `sub` may be desirable, e.g., to include both an bearer's IPv4 and IPv6 address.
+Multiple BIs within `bearers` may be desirable, e.g., to include both a bearer's IPv4 and IPv6 address.
 The claim value of `emb` MUST be a JSON {{!RFC7159}} object with the following key-value mappings.
 
 | Claim | Status | Semantics | Encoding |
@@ -247,7 +247,7 @@ Payload:
   "nbf": 1672916137,
   "exp": 1675590932,
   "iss": "https://example.com",
-  "sub": ["[2001:0db8:582:ae33::29]"]
+  "bearers": ["[2001:0db8:582:ae33::29]"]
 }
 ~~~~
 
@@ -288,7 +288,7 @@ The semantics of these fields are defined in {{!RFC6962}} for `v1` and {{!RFC916
 | ----- | ------ | --------- | -------- |
 | `prp` | OPTIONAL | Purpose constraint | Array of `purpose` |
 | `dst` | OPTIONAL | Distribution method constraint | Array of `distribution-method` |
-| `sub` | OPTIONAL | Bearer constraint | Array of BIs |
+| `bearers` | OPTIONAL | Bearer constraint | Array of BIs |
 | `wnd` | OPTIONAL | Maximum emblem lifetime | Integer |
 
 We say that an endorsement *endorses* a token if its `key` claim equals the token's verification key, and its `sub` claim equals the token's `iss` claim.
@@ -298,7 +298,7 @@ We say that an emblem is *valid* with respect to an endorsement if all the follo
 
 * The endorsement's `emb.prp` claim is undefined or a superset of the emblem's `emb.prp` claim.
 * The endorsement's `emb.dst` claim is undefined or a superset of the emblem's `emb.dst` claim.
-* The endorsement's `emb.sub` claim is undefined or for each BI within the emblem's `emb.sub` claim, there exists an BI within the endorsement's `emb.sub` claim which is more general than the emblem's `emb.sub` claim.
+* The endorsement's `emb.bearers` claim is undefined or for each BI within the emblem's `emb.bearers` claim, there exists an BI within the endorsement's `emb.bearers` claim which is more general than the emblem's `emb.bearers` claim.
 * The endorsement's `emb.wnd` claim is undefined or the sum of emblem's `nbf` and the endorsement's `emb.wnd` claims is greater than or equal to the emblem's `exp` claim.
 
 # Public Key Commitment {#pk-distribution}
