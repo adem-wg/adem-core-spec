@@ -304,7 +304,7 @@ We say that an emblem is *valid* with respect to an endorsement if all the follo
 # Public Key Commitment {#pk-distribution}
 
 Parties must undeniably link their root public keys to their OI.
-In this section, we specify the configuration of a PP's OI.
+In this section, we specify the configuration of a emblem issuer's OI.
 Root public keys are all public keys which are only endorsed by third parties and never endorsed by the organization itself.
 A party MAY have multiple root public keys.
 
@@ -337,13 +337,13 @@ All such domains MUST serve the content type `application/json` and MUST be serv
 
 A sign of protection is an emblem, accompanied by one or more endorsements.
 Whenever a token includes OIs (in `iss` or `sub` claims), these OIs must be configured accordingly.
-An OI serves to identify a PP or authority in the real world.
+An OI serves to identify an emblem issuer or authority in the real world.
 Hence, parties MUST configure the website hosted under their OI to provide sufficient identifying information.
 
 Furthermore, parties MUST serve their root keys encoded in HTTPS headers with their website.
 These root keys MAY be endorsed by other parties.
-If this is the case, such endorsements MUST be served alongside the root keys at the PP's OI.
-All of a PP's keys, endorsed by third parties MUST be served under their OI.
+If this is the case, such endorsements MUST be served alongside the root keys at the emblem issuer's OI.
+All of an emblem issuer's keys, endorsed by third parties MUST be served under their OI.
 PPs MAY use their root keys to sign further, internal endorsements, i.e., endorse keys of their own to either issue emblems or further endorsements.
 
 ## Verification
@@ -385,7 +385,7 @@ The set of OIs returned by the verification procedure encodes the OIs of endorsi
 We strongly RECOMMEND against accepting emblems resulting in `SIGNED-UNTRUSTED`.
 In such cases, validators should aim to authenticate the respective public keys via other, out-of-band methods.
 This effectively lifts the result to `SIGNED-TRUSTED`.
-Signed emblems are supported for cases of emergency where a PP is able to communicate one or more public key, but might not be able to set up a signing infrastructure linking their bearers to a root key.
+Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public key, but might not be able to set up a signing infrastructure linking their bearers to a root key.
 
 There is no definite guideline on how to choose which keys to trust, i.e., which keys to pass as trusted public key to the verification procedure.
 Some validators may have pre-existing trust relationships with some authorities, e.g., military units of a nation state could use the public keys of their nation state or allies.
