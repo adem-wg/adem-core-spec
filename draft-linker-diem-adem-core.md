@@ -102,65 +102,50 @@ However, to limit their scope, we do not follow the specification of URIs and in
 
 #### Syntax
 
-Bearer identifiers point to an address and optionally port combination.
-They follow the syntax (`domain-name`, `IPv6` defined below):
+Bearer identifiers follow the syntax (`domain-name`, `IPv6` defined below):
 
 ~~~~
-bearer-identifier = address [ ":" port ]
-
-address = domain-name | "[" IPv6 "]"
-
-port = DIGIT+
+bearer-identifier = domain-name | "[" IPv6 "]"
 ~~~~
 
-These are examples of BIs:
-
-* `*.example.com:443`
-* `[2606:2800:220:1:248:1893:25c8:1946]:21`
-* `[::FFFF:93.184.216.34]:22`
-
-BIs identify an address, and port combination.
-There are two types of addresses.
-Domain names and IPv6 addresses.
-Note that IPv6 addresses also support IPv4 addresses through "IPv4-Mapped IPv6 Addresses" (cf. {{!RFC4291}}, [Section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)).
 Domain names (`domain-name`) MUST be formatted as usual and specified in {{!RFC1035}} with the exception that the leftmost label MAY be the single-character wildcard `"*"`.
-In particular, `"*"` itself is a valid domain name.
+In particular, `"*"` itself is a valid domain name in context of this specification.
 
 IPv6 addresses (`IPv6`) MUST be formatted following {{!RFC4291}}.
 IPv6 addresses MUST be global unicast or link-local unicast addresses.
+Note that the syntax of IPv6 addresses also support IPv4 addresses through "IPv4-Mapped IPv6 Addresses" (cf. {{!RFC4291}}, [Section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)).
+
+These are examples of BIs:
+
+* `*.example.com`
+* `[2606:2800:220:1:248:1893:25c8:1946]`
+* `[::FFFF:93.184.216.34]`
 
 #### Semantics
 
-Several kinds of bearers can be covered by bearer identifiers:
+Several kinds of bearers can be identified by bearer identifiers:
 
 * Network facing processes, e.g., web servers
-* Local computation, e.g., arbitrary processes
 * Computational devices both in the virtual sense, e.g., a virtual machine, and in the physical sense, e.g., a laptop
 * Networks
 
-BIs can *cover* any of these bearers, but they can only *point* to network-connected processes or static data.
-To decide which bearers BIs point to, one must *resolve* an BI.
-One BI need not necessarily only point to a single bearer.
-Depending on the concrete BI, e.g., its wildcards, it may point to multiple bearers.
-For example: `example.com` (amongst other bearers) points at network facing processes hosted under any IP that `example.com` resolves to, on any port.
+A BI identifies a set of IPv4 or IPv6 addresses:
 
-To resolve an BI, it is first interpreted as an implicit or explicit set of addresses.
-If `address` is an IP address, the set contains this address only.
-If it is an IP address prefix, it contains all addresses matching that prefix.
-If it is a domain name, it contains any IP address this domain name can be resolved to.
-If it is a domain name starting with the wildcard prefix `"*"`, it contains any IP address this domain name or any of its subdomains can be resolved to.
+- If the BI is an IPv6 address, it identifies this address only.
+- If the BI an IPv6 address prefix, it identifies all IPv6 addresses matching that prefix.
+- If the BI is a domain name, it identifies any address for which there is an `A` or `AAAA` record for that domain name.
+- If the BI is a domain name starting with the wildcard `"*"`, it identifies any address for which there is an `A` or `AAAA` record for that domain name or any of its subdomains.
 
 Any process reachable under any of the addresses pointed towards by `address` and on the port specified (or any port, if unspecified) is pointed by the respective BI.
 
 #### Order
 
 BIs may not only be used for identification but also for constraint purposes.
-For example, an endorsement may constrain emblems to only signal protection for a specific IP range.
+For example, an endorsement may constrain emblems to only signal protection for a specific IP address range.
 In this section, we define an order on BIs so that one can verify if an identifying BI complies with a constraining BI.
 
 We define an BI A to be *more general* than an BI B, if all of the following conditions apply:
 
-* A's `port` part is undefined or equal to B's `port` part.
 * If A encodes a domain name and does not contain the wildcard `"*"`, B encodes a domain name, too, and A is equal to B.
 * If A encodes a domain name and contains the wildcard `"*"`, B encodes a domain name, too, and B is a subdomain of A excluding the wildcard `"*"`.
 In this regard, any domain is considered a subdomain of itself.
