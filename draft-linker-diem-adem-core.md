@@ -25,7 +25,6 @@ venue:
 author:
  -
     fullname: "Felix Linker"
-    organization: Your Organization Here
     email: "linkerfelix@gmail.com"
 
 normative:
