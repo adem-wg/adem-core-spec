@@ -366,6 +366,8 @@ Other validators might be fine with fetching public keys authenticated only by t
 An emblem for which the verification procedure produces a result other than `INVALID` marks any asset whose address is identified by at least one of the emblem's BIs.
 Such an emblem signals that the respective asset is enjoys the specific protections of IHL.
 
+Emblem issuers MUST only issue emblems for assets that are used only for protected purposes.
+
 # Algorithms
 
 ## Signed Emblem Verification Procedure {#signed-emblems}
