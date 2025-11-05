@@ -200,10 +200,9 @@ The claim value of `emb` MUST be a JSON {{!RFC8259}} object with the following k
 
       purpose = "protective" | "indicative"
 
-      distribution-method = "dns" | "tls" | "udp"
+      distribution-method = "dns" | "icmp" | "udp"
 
-The distribution channels defined above correspond to the distribution methods as specified in {{ADEM-DNS}}, {{ADEM-TLS}}, and {{ADEM-UDP}} respectively.
-
+<!-- TODO: Explain distribution methods -->
 
 #### Example
 
