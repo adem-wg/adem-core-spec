@@ -610,6 +610,9 @@ Table of Contents
    least one of the emblem's BIs.  Such an emblem signals that the
    respective asset is enjoys the specific protections of IHL.
 
+   Emblem issuers MUST only issue emblems for assets that are used only
+   for protected purposes.
+
 6.  Algorithms
 
 6.1.  Signed Emblem Verification Procedure
