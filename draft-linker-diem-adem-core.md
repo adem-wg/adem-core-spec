@@ -176,7 +176,7 @@ Any token MUST include the `cty` (content type) header parameter.
 
 ### Emblems {#emblems}
 
-An emblem is encoded either as JWS or as an unsecured JWT which signals protection of digital bearers.
+An emblem is encoded either as JWS or as an unsecured JWT which signals protection of bearers.
 It is distinguished by the `cty` header parameter value which MUST be `"adem-emb"`.
 Its payload includes the JWT claims defined in the table below, following {{!RFC7519}}, [Section 4.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1).
 All other registered JWT claims MUST NOT be included.
