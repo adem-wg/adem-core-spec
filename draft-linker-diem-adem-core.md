@@ -36,10 +36,10 @@ informative:
 
 --- abstract
 
-<!-- TODO: Rewrite -->
-Protected Parties (PPs) offer humanitarian services in regions of armed conflict and are granted special protection under international humanitarian law (IHL).
-They may advertise their protected status by the well-known emblems of the red cross, red crescent, and the red crystal.
-This document specifies the scheme *An Authenticated Digital EMblem* (ADEM) to distribute digital emblems, which mark bearers as protected under IHL in an analogy to the physical emblems.
+In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
+This enables military units to identify assets as respected and protected under international humanitarian law.
+This draft specifies the format and trust architecture of a protective, digital emblem to network-connected infrastructure.
+Such emblems mark bearers as protected under IHL analogously to the physical emblems.
 
 --- middle
 
