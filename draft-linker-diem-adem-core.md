@@ -117,7 +117,7 @@ Note that the syntax of IPv6 addresses also support IPv4 addresses through "IPv4
 These are examples of BIs:
 
 * `*.example.com`
-* `[2606:2800:220:1:248:1893:25c8:1946]`
+* `[2001:0db8::248:1893:25c8:1946]`
 * `[::FFFF:93.184.216.34]`
 
 #### Semantics
