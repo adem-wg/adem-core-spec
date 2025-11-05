@@ -294,7 +294,7 @@ Root public keys are all public keys which are only endorsed by third parties an
 A party MAY have multiple root public keys.
 
 Any root public key MUST be encoded as JWK as per {{!RFC7517}} and {{!RFC7518}}.
-Root public keys MUST include the `alg` and `kid` parameters, and the `kid` parameter MUST be computed using the hashing algorithm as specified in {{jwk-hashing}}.
+Root public keys MUST include the `alg` and `kid` parameters, and the `kid` parameter MUST be the key's JWK Thumbprint as per {{!RFC7638}}, encoded in Base 32 as per {{!RFC4648}}.
 
 For a root public key to be configured correctly, there MUST be an X.509 certificate that:
 
@@ -369,21 +369,6 @@ An emblem for which the verification procedure produces a result other than `INV
 Such an emblem signals that the respective asset is enjoys the specific protections of IHL.
 
 # Algorithms
-
-## JWK Hashing {#jwk-hashing}
-
-Context:
-
-* Input: A JWK as per {{!RFC7517}} in arbitrary encoding.
-* Output: A cryptographically secure hash of the JWK
-
-Algorithm:
-
-1. Parse the JWK as JSON object.
-2. Drop the `kid` parameter from the JWK.
-3. Compute a canonical representation of the remaining JWK as per {{!RFC8785}}.
-4. Compute the SHA-256 hash of the canonical representation
-5. Return the hash in base32 encoding in all lower-case and with trailing `=` removed.
 
 ## Signed Emblem Verification Procedure {#signed-emblems}
 
