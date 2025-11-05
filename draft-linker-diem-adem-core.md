@@ -170,7 +170,7 @@ For example, `https://example.com` is a valid OI, but `https://EXAMPLE.COM` is n
 
 ## Token Encoding
 
-Tokens MUST be encoded as a JWS {{!RFC7515}} or as an unsecured JWT as defined in {{!RFC7519}}, [Section 6](https://datatracker.ietf.org/doc/html/rfc7519#section-6), encoded either in compact serialization or as signed CBOR Web Token (CWT) {{!RFC8392}}.
+Tokens MUST be encoded as a JWS {{!RFC7515}} or as an unsecured JWT as defined in {{!RFC7519}}, [Section 6](https://datatracker.ietf.org/doc/html/rfc7519#section-6) in compact serialization.
 Tokens encoded as JWS MUST only use JWS protected headers and MUST include the `jwk` or the `kid` header parameter.
 Any token MUST include the `cty` (content type) header parameter.
 
@@ -311,25 +311,12 @@ For a root public key to be configured correctly, there MUST be an X.509 certifi
 We intentionally do not specify how clients should check a certificate's revocation status.
 It is RECOMMENDED that clients use offline revocation checks that are provided by major browser vendors, for example, [OneCRL or CRLite by Mozilla](https://wiki.mozilla.org/CA/Revocation_Checking_in_Firefox), or [CRLSet by Chrome](https://chromium.googlesource.com/playground/chromium-org-site/+/refs/heads/main/Home/chromium-security/crlsets.md).
 
-`adem-configuration.<OI>` and all its subdomains SHOULD serve the party's root public keys, but MAY not be live, e.g., there MAY be no A or AAAA records configured for the domains.
-Serving of public keys is optional to allow parties to cope with outages.
-If it is live, `adem-configuration.<OI>` MUST serve a JWK Set {{!RFC7517}}, [Section 5](https://www.rfc-editor.org/rfc/rfc7517#section-5), that includes all root public keys.
-Each subdomain relating to a kid MUST serve the respectively identified key in JSON encoding.
-If it is live, for any given root key with KID `<KID>`, `<KID>.adem-configuration.<OI>` MUST serve that root key in JWK Format {{!RFC7517}}, [Section 4](https://www.rfc-editor.org/rfc/rfc7517#section-4).
-All such domains MUST serve the content type `application/json` and MUST be served using HTTPS.
-
 # Signs of Protection
 
 A sign of protection is an emblem, accompanied by one or more endorsements.
 Whenever a token includes OIs (in `iss` or `sub` claims), these OIs must be configured accordingly.
 An OI serves to identify an emblem issuer or authority in the real world.
 Hence, parties MUST configure the website hosted under their OI to provide sufficient identifying information.
-
-Furthermore, parties MUST serve their root keys encoded in HTTPS headers with their website.
-These root keys MAY be endorsed by other parties.
-If this is the case, such endorsements MUST be served alongside the root keys at the emblem issuer's OI.
-All of an emblem issuer's keys, endorsed by third parties MUST be served under their OI.
-PPs MAY use their root keys to sign further, internal endorsements, i.e., endorse keys of their own to either issue emblems or further endorsements.
 
 ## Verification
 
@@ -378,15 +365,8 @@ Other validators might be fine with fetching public keys authenticated only by t
 
 ## Protection
 
-Any bearer whose address is resolved within context of a valid emblem must be considered to be marked as protected under IHL.
-In certain contexts, this might apply to a wide range of bearers.
-For example, a router could distribute emblems for its entire address space using ICMP using an IP range.
-
-Bearers MUST only mark as protected what is exposed to potential validators.
-For example, consider a gateway-router also running an intranet where not every node is internet-connected.
-The router must only distribute emblems for internet-connected nodes to validators not within the intranet, but may distribute emblems for the non-internet connected nodes within the intranet.
-But at the same time, validators must proceed with caution when changing their vantage point.
-If malware were to infect that router, it must check if bearers now exposed to it are protected, too.
+An emblem for which the verification procedure produces a result other than `INVALID` marks any asset whose address is identified by at least one of the emblem's BIs.
+Such an emblem signals that the respective asset is enjoys the specific protections of IHL.
 
 # Algorithms
 
