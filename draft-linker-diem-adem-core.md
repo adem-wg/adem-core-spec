@@ -191,7 +191,7 @@ All other registered JWT claims MUST NOT be included.
 | `emb` | REQUIRED | Emblem details | JSON object (as follows) |
 
 Multiple BIs within `bearers` may be desirable, e.g., to include both a bearer's IPv4 and IPv6 address.
-The claim value of `emb` MUST be a JSON {{!RFC7159}} object with the following key-value mappings.
+The claim value of `emb` MUST be a JSON {{!RFC8259}} object with the following key-value mappings.
 
 | Claim | Status | Semantics | Encoding |
 | ----- | ------ | --------- | -------- |
