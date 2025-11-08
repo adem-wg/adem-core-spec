@@ -3,9 +3,9 @@
 
 
 Digital Emblems                                                F. Linker
-Internet-Draft                                           5 November 2025
+Internet-Draft                                           8 November 2025
 Intended status: Informational                                          
-Expires: 9 May 2026
+Expires: 12 May 2026
 
 
                         ADEM Core Specification
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 May 2026.
+   This Internet-Draft will expire on 12 May 2026.
 
 Copyright Notice
 
@@ -274,10 +274,11 @@ Table of Contents
 
    Tokens MUST be encoded as a JWS [RFC7515] or as an unsecured JWT as
    defined in [RFC7519], Section 6
-   (https://datatracker.ietf.org/doc/html/rfc7519#section-6) in compact
-   serialization.  Tokens encoded as JWS MUST only use JWS protected
-   headers and MUST include the jwk or the kid header parameter.  Any
-   token MUST include the cty (content type) header parameter.
+   (https://datatracker.ietf.org/doc/html/rfc7519#section-6), encoded
+   either in compact serialization or as signed CBOR Web Token (CWT)
+   [RFC8392].  Tokens encoded as JWS MUST only use JWS protected headers
+   and MUST include the jwk or the kid header parameter.  Any token MUST
+   include the cty (content type) header parameter.
 
 3.2.1.  Emblems
 
@@ -819,6 +820,10 @@ Table of Contents
               Interchange Format", STD 90, RFC 8259,
               DOI 10.17487/RFC8259, December 2017,
               <https://www.rfc-editor.org/rfc/rfc8259>.
+
+   [RFC8392]  Jones, M., Wahlstroem, E., Erdtman, S., and H. Tschofenig,
+              "CBOR Web Token (CWT)", RFC 8392, DOI 10.17487/RFC8392,
+              May 2018, <https://www.rfc-editor.org/rfc/rfc8392>.
 
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
