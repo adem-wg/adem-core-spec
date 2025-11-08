@@ -292,7 +292,7 @@ Root public keys are all public keys which are only endorsed by third parties an
 A party MAY have multiple root public keys.
 
 Any root public key MUST be encoded as JWK as per {{!RFC7517}} and {{!RFC7518}}.
-Root public keys MUST include the `alg` and `kid` parameters, and the `kid` parameter MUST be the key's JWK Thumbprint as per {{!RFC7638}}, encoded in Base 32 as per {{!RFC4648}}.
+Root public keys MUST include the `alg` and `kid` parameters, and the `kid` parameter MUST be the key's JWK Thumbprint computed using SHA-256 as per {{!RFC7638}} and encoded in Base 32 as per {{!RFC4648}}.
 
 For a root public key to be configured correctly, there MUST be an X.509 certificate that:
 
