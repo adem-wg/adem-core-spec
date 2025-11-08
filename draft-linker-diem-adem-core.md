@@ -173,6 +173,14 @@ Tokens MUST be encoded as a JWS {{!RFC7515}} or as an unsecured JWT as defined i
 Tokens encoded as JWS MUST only use JWS protected headers and MUST include the `jwk` or the `kid` header parameter.
 Any token MUST include the `cty` (content type) header parameter.
 
+### Key Identifiers and Key Formats
+
+Keys are encoded as JSON Web Keys (JWKs) {{!RFC7517}}.
+In context of ADEM, keys MUST include the `alg` parameter.
+We identify keys using their key identifier `kid`.
+Whenever a JWK in context of ADEM contains the `kid` parameter, it MUST be computed as per {{jwk-hashing}}.
+See {{jwk-hashing}} for an example.
+
 ### Emblems {#emblems}
 
 An emblem is encoded either as JWS or as an unsecured JWT which signals protection of bearers.
@@ -250,7 +258,7 @@ All otger registered JWT claims MUST NOT be included.
 | `exp` | REQUIRED | As per {{!RFC7519}} | |
 | `iss` | RECOMMENDED | Endorsing organization | OI |
 | `sub` | RECOMMENDED | Endorsed organization | OI |
-| `key` | REQUIRED | Endorsed organization's key | JWK as per {{!RFC7517}} (must include `alg`) |
+| `key` | REQUIRED | Endorsed organization's public key | Endorsed key as full key or by reference to its `kid`. |
 | `log` | OPTIONAL | Root key CT logs | Array (as follows) |
 | `end` | REQUIRED | Endorsed key can endorse further | Boolean |
 | `emb` | REQUIRED | Emblem constraints | JSON object (as follows) |
@@ -290,10 +298,6 @@ Parties must undeniably link their root public keys to their OI.
 In this section, we specify the configuration of a emblem issuer's OI.
 Root public keys are all public keys which are only endorsed by third parties and never endorsed by the organization itself.
 A party MAY have multiple root public keys.
-
-Any root public key MUST be encoded as JWK as per {{!RFC7517}} and {{!RFC7518}}.
-Root public keys MUST include the `alg` and `kid` parameters, and the `kid` parameter MUST be computed using the hashing algorithm as specified in {{jwk-hashing}}.
-
 For a root public key to be configured correctly, there MUST be an X.509 certificate that:
 
 * MUST NOT be revoked
@@ -374,16 +378,15 @@ Emblem issuers MUST only issue emblems for assets that are used only for protect
 
 Context:
 
-* Input: A JWK as per {{!RFC7517}} in arbitrary encoding.
-* Output: A cryptographically secure hash of the JWK
+* Input: A JWK public key as per {{!RFC7517}} in arbitrary encoding.
+* Output: A hash of the JWK
 
 Algorithm:
 
 1. Parse the JWK as JSON object.
 2. Drop the `kid` parameter from the JWK.
-3. Compute a canonical representation of the remaining JWK as per {{!RFC8785}}.
-4. Compute the SHA-256 hash of the canonical representation
-5. Return the hash in base32 encoding in all lower-case and with trailing `=` removed.
+3. Compute the key's thumbprint using SHA-256 as per {{!RFC7638}}.
+4. Return the digest in base32 encoding as per {{!RFC4648}} in all lower-case and with trailing `=` removed.
 
 ## Signed Emblem Verification Procedure {#signed-emblems}
 
@@ -470,6 +473,11 @@ This allows an adversary to force rejection of a set of tokens by altering, e.g.
 
 However, this does not constitute a new attack.
 Such adversaries could flip a bit in the emblem's signature, rendering the set of tokens invalid, too.
+
+## Key Identifiers
+
+Key identifiers were designed such that they commit to the identified key, i.e., key identifiers must provide strong collision-resistance.
+This is ensured by computing it using SHA-256.
 
 # IANA Considerations
 
