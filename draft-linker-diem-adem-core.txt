@@ -78,20 +78,23 @@ Table of Contents
        3.1.1.  Bearer Identifiers
        3.1.2.  Organization Identifiers
      3.2.  Token Encoding
-       3.2.1.  Emblems
-       3.2.2.  Endorsements
+       3.2.1.  Key Identifiers and Key Formats
+       3.2.2.  Emblems
+       3.2.3.  Endorsements
    4.  Public Key Commitment
    5.  Signs of Protection
      5.1.  Verification
        5.1.1.  Comments on Trust Policies
      5.2.  Protection
    6.  Algorithms
-     6.1.  Signed Emblem Verification Procedure
-     6.2.  Organizational Emblem Verification Procedure
-     6.3.  Endorsed Emblem Verification Procedure
+     6.1.  JWK Hashing
+     6.2.  Signed Emblem Verification Procedure
+     6.3.  Organizational Emblem Verification Procedure
+     6.4.  Endorsed Emblem Verification Procedure
    7.  Security Considerations
      7.1.  No Endorsements without iss
      7.2.  Token Order
+     7.3.  Key Identifiers
    8.  IANA Considerations
    9.  Normative References
    Author's Address
@@ -280,7 +283,15 @@ Table of Contents
    and MUST include the jwk or the kid header parameter.  Any token MUST
    include the cty (content type) header parameter.
 
-3.2.1.  Emblems
+3.2.1.  Key Identifiers and Key Formats
+
+   Keys are encoded as JSON Web Keys (JWKs) [RFC7517].  In context of
+   ADEM, keys MUST include the alg parameter.  We identify keys using
+   their key identifier kid.  Whenever a JWK in context of ADEM contains
+   the kid parameter, it MUST be computed as per Section 6.1.  See
+   Section 6.1 for an example.
+
+3.2.2.  Emblems
 
    An emblem is encoded either as JWS or as an unsecured JWT which
    signals protection of bearers.  It is distinguished by the cty header
@@ -333,7 +344,7 @@ Table of Contents
 
      distribution-method = "dns" | "icmp" | "udp"
 
-3.2.1.1.  Example
+3.2.2.1.  Example
 
    For example, an emblem might comprise the following header and
    payload.
@@ -360,7 +371,7 @@ Table of Contents
      "bearers": ["[2001:0db8:582:ae33::29]"]
    }
 
-3.2.2.  Endorsements
+3.2.3.  Endorsements
 
    Endorsements are encoded as JWSs.  Endorsements attest two
    statements: that a public key is affiliated with an organization,
@@ -370,34 +381,40 @@ Table of Contents
    includes the JWT claims defined in the table below.  All otger
    registered JWT claims MUST NOT be included.
 
-    +=======+=============+====================+======================+
-    | Claim | Status      | Semantics          | Encoding             |
-    +=======+=============+====================+======================+
-    | ver   | REQUIRED    | Version string     | "v1"                 |
-    +-------+-------------+--------------------+----------------------+
-    | iat   | REQUIRED    | As per [RFC7519]   |                      |
-    +-------+-------------+--------------------+----------------------+
-    | nbf   | REQUIRED    | As per [RFC7519]   |                      |
-    +-------+-------------+--------------------+----------------------+
-    | exp   | REQUIRED    | As per [RFC7519]   |                      |
-    +-------+-------------+--------------------+----------------------+
-    | iss   | RECOMMENDED | Endorsing          | OI                   |
-    |       |             | organization       |                      |
-    +-------+-------------+--------------------+----------------------+
-    | sub   | RECOMMENDED | Endorsed           | OI                   |
-    |       |             | organization       |                      |
-    +-------+-------------+--------------------+----------------------+
-    | key   | REQUIRED    | Endorsed           | JWK as per [RFC7517] |
-    |       |             | organization's key | (must include alg)   |
-    +-------+-------------+--------------------+----------------------+
-    | log   | OPTIONAL    | Root key CT logs   | Array (as follows)   |
-    +-------+-------------+--------------------+----------------------+
-    | end   | REQUIRED    | Endorsed key can   | Boolean              |
-    |       |             | endorse further    |                      |
-    +-------+-------------+--------------------+----------------------+
-    | emb   | REQUIRED    | Emblem constraints | JSON object (as      |
-    |       |             |                    | follows)             |
-    +-------+-------------+--------------------+----------------------+
+      +=======+=============+================+======================+
+      | Claim | Status      | Semantics      | Encoding             |
+      +=======+=============+================+======================+
+      | ver   | REQUIRED    | Version string | "v1"                 |
+      +-------+-------------+----------------+----------------------+
+      | iat   | REQUIRED    | As per         |                      |
+      |       |             | [RFC7519]      |                      |
+      +-------+-------------+----------------+----------------------+
+      | nbf   | REQUIRED    | As per         |                      |
+      |       |             | [RFC7519]      |                      |
+      +-------+-------------+----------------+----------------------+
+      | exp   | REQUIRED    | As per         |                      |
+      |       |             | [RFC7519]      |                      |
+      +-------+-------------+----------------+----------------------+
+      | iss   | RECOMMENDED | Endorsing      | OI                   |
+      |       |             | organization   |                      |
+      +-------+-------------+----------------+----------------------+
+      | sub   | RECOMMENDED | Endorsed       | OI                   |
+      |       |             | organization   |                      |
+      +-------+-------------+----------------+----------------------+
+      | key   | REQUIRED    | Endorsed       | Endorsed key as full |
+      |       |             | organization's | key or by reference  |
+      |       |             | public key     | to its kid.          |
+      +-------+-------------+----------------+----------------------+
+      | log   | OPTIONAL    | Root key CT    | Array (as follows)   |
+      |       |             | logs           |                      |
+      +-------+-------------+----------------+----------------------+
+      | end   | REQUIRED    | Endorsed key   | Boolean              |
+      |       |             | can endorse    |                      |
+      |       |             | further        |                      |
+      +-------+-------------+----------------+----------------------+
+      | emb   | REQUIRED    | Emblem         | JSON object (as      |
+      |       |             | constraints    | follows)             |
+      +-------+-------------+----------------+----------------------+
 
                                   Table 3
 
@@ -468,15 +485,8 @@ Table of Contents
    this section, we specify the configuration of a emblem issuer's OI.
    Root public keys are all public keys which are only endorsed by third
    parties and never endorsed by the organization itself.  A party MAY
-   have multiple root public keys.
-
-   Any root public key MUST be encoded as JWK as per [RFC7517] and
-   [RFC7518].  Root public keys MUST include the alg and kid parameters,
-   and the kid parameter MUST be the key's JWK Thumbprint as per
-   [RFC7638], encoded in Base 32 as per [RFC4648].
-
-   For a root public key to be configured correctly, there MUST be an
-   X.509 certificate that:
+   have multiple root public keys.  For a root public key to be
+   configured correctly, there MUST be an X.509 certificate that:
 
    *  MUST NOT be revoked
 
@@ -543,7 +553,7 @@ Table of Contents
 
    1.  If the emblem does not bear a signature, return UNSIGNED.
 
-   2.  Run the _signed emblem verification procedure_ (Section 6.1;
+   2.  Run the _signed emblem verification procedure_ (Section 6.2;
        results in one of SIGNED-TRUSTED, SIGNED-UNTRUSTED, or INVALID).
 
    3.  If previous procedure resulted in INVALID or the emblem does not
@@ -551,7 +561,7 @@ Table of Contents
        result and the emtpy set of OIs.
 
    4.  Run the _organizational emblem verification procedure_
-       (Section 6.2; results in one of ORGANIZATIONAL-TRUSTED,
+       (Section 6.3; results in one of ORGANIZATIONAL-TRUSTED,
        ORGANIZATIONAL-UNTRUSTED, INVALID).
 
    5.  If the previous procedure resulted in INVALID return INVALID and
@@ -563,7 +573,7 @@ Table of Contents
        the strongest return value matching *-TRUSTED, and the empty set
        of OIs.
 
-   7.  Run the _endorsed emblem verification procedure_ (Section 6.3;
+   7.  Run the _endorsed emblem verification procedure_ (Section 6.4;
        results in a set of OIs and one of ENDORSED-TRUSTED, ENDORSED-
        UNTRUSTED, INVALID).
 
@@ -616,7 +626,26 @@ Table of Contents
 
 6.  Algorithms
 
-6.1.  Signed Emblem Verification Procedure
+6.1.  JWK Hashing
+
+   Context:
+
+   *  Input: A JWK public key as per [RFC7517] in arbitrary encoding.
+
+   *  Output: A hash of the JWK
+
+   Algorithm:
+
+   1.  Parse the JWK as JSON object.
+
+   2.  Drop the kid parameter from the JWK.
+
+   3.  Compute the key's thumbprint using SHA-256 as per [RFC7638].
+
+   4.  Return the digest in base32 encoding as per [RFC4648] in all
+       lower-case and with trailing = removed.
+
+6.2.  Signed Emblem Verification Procedure
 
    Context:
 
@@ -653,7 +682,7 @@ Table of Contents
    invalid if the indicated order does not yield a valid chain of
    endorsements.
 
-6.2.  Organizational Emblem Verification Procedure
+6.3.  Organizational Emblem Verification Procedure
 
    Context:
 
@@ -679,7 +708,7 @@ Table of Contents
        public key, return ORGANIZATIONAL-TRUSTED.  Otherwise, return
        ORGANIZATIONAL-UNTRUSTED.
 
-6.3.  Endorsed Emblem Verification Procedure
+6.4.  Endorsed Emblem Verification Procedure
 
    Context:
 
@@ -731,7 +760,7 @@ Table of Contents
 7.1.  No Endorsements without iss
 
    The procedures to verify organizational or endorsed emblems as
-   specified in Section 6.2 and Section 6.3 assume that the emblem's iss
+   specified in Section 6.3 and Section 6.4 assume that the emblem's iss
    claim is defined.  Practically speaking, this implies that parties
    can only go beyond pure public key authentication (where public keys
    need to be authenticated out-of-band) by stating an OI.
@@ -750,7 +779,7 @@ Table of Contents
 
 7.2.  Token Order
 
-   As specified in Section 6.1, clients MAY reject sets of tokens as
+   As specified in Section 6.2, clients MAY reject sets of tokens as
    invalid if the order of tokens as indicated by the sending client
    does not yield a valid chain of endorsements.  This allows an
    adversary to force rejection of a set of tokens by altering, e.g.,
@@ -759,6 +788,12 @@ Table of Contents
    However, this does not constitute a new attack.  Such adversaries
    could flip a bit in the emblem's signature, rendering the set of
    tokens invalid, too.
+
+7.3.  Key Identifiers
+
+   Key identifiers were designed such that they commit to the identified
+   key, i.e., key identifiers must provide strong collision-resistance.
+   This is ensured by computing it using SHA-256.
 
 8.  IANA Considerations
 
@@ -799,10 +834,6 @@ Table of Contents
    [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
               DOI 10.17487/RFC7517, May 2015,
               <https://www.rfc-editor.org/rfc/rfc7517>.
-
-   [RFC7518]  Jones, M., "JSON Web Algorithms (JWA)", RFC 7518,
-              DOI 10.17487/RFC7518, May 2015,
-              <https://www.rfc-editor.org/rfc/rfc7518>.
 
    [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
               (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
