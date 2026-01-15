@@ -170,7 +170,7 @@ For example, `https://example.com` is a valid OI, but `https://EXAMPLE.COM` is n
 ## Token Encoding
 
 Tokens MUST be encoded as a JWS {{!RFC7515}} or as an unsecured JWT as defined in {{!RFC7519}}, [Section 6](https://datatracker.ietf.org/doc/html/rfc7519#section-6), encoded either in compact serialization or as signed CBOR Web Token (CWT) {{!RFC8392}}.
-Tokens encoded as JWS MUST only use JWS protected headers and MUST include the `jwk` or the `kid` header parameter.
+Tokens encoded as JWS MUST only use JWS protected headers and MUST include the `jwk` header parameter.
 Any token MUST include the `cty` (content type) header parameter.
 
 ### Key Identifiers and Key Formats
@@ -221,7 +221,7 @@ Header:
 ~~~~json
 {
   "alg": "ES512",
-  "kid": "4WICC9pZ5zh6m3sfNYwwLilHzNazbFoJU6Qe5ds_8pY",
+  "jwk": { ... },
   "cty": "adem-emb"
 }
 ~~~~
@@ -258,7 +258,7 @@ All otger registered JWT claims MUST NOT be included.
 | `exp` | REQUIRED | As per {{!RFC7519}} | |
 | `iss` | RECOMMENDED | Endorsing organization | OI |
 | `sub` | RECOMMENDED | Endorsed organization | OI |
-| `key` | REQUIRED | Endorsed organization's public key | Endorsed key as full key or by reference to its `kid`. |
+| `key` | REQUIRED | Endorsed organization's public key | Endorsed key by reference to its `kid`. |
 | `log` | OPTIONAL | Root key CT logs | Array (as follows) |
 | `end` | REQUIRED | Endorsed key can endorse further | Boolean |
 | `emb` | REQUIRED | Emblem constraints | JSON object (as follows) |
