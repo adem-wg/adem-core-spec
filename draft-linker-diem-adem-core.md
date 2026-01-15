@@ -38,18 +38,18 @@ informative:
 In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
 This enables military units to identify assets as respected and protected under international humanitarian law.
 This draft specifies the format and trust architecture of a protective, digital emblem to network-connected infrastructure.
-Such emblems mark bearers as protected under IHL analogously to the physical emblems.
+Such emblems mark assets as protected under IHL analogously to the physical emblems.
 
 --- middle
 
 # Introduction
 
 International Humanitarian Law (IHL) mandates that military units must not attack medical facilities, such as hospitals.
-The emblems of the red cross, red crescent, and red crystal are used to mark physical infrastructure (e.g., by a red cross painted on a hospital's rooftop), thereby enabling military units to identify those bearers as protected under IHL.
+The emblems of the red cross, red crescent, and red crystal are used to mark physical infrastructure (e.g., by a red cross painted on a hospital's rooftop), thereby enabling military units to identify those assets as protected under IHL.
 This document specifies the structure and trust model of digital emblems for IHL that can be used to mark digital infrastructure as protected under IHL analogously to the physical emblems.
 We call this system *ADEM*, which stands for an Authentic Digital EMblem.
 
-In ADEM, emblems are signed statements that mark a *bearer* as proteced under IHL.
+In ADEM, emblems are signed statements that mark a *assets* as proteced under IHL.
 Emblems are issued by *emblem issuers*.
 Emblem issuer can be authorized by *authorities*.
 Authorities do so by signing *endorsements* for emblem issuers.
@@ -70,8 +70,8 @@ When signed by an authority, it attests that the authorized issuer can generally
 **Root Key** Organizations control root keys, which identify them cryptographically.
 Any key of an organization that is endorsed by other parties is a root key.
 
-**Bearer** A bearer is a network-connected asset that enjoys the specific protections under IHL.
-Bearers must be unambiguously identifiable and unambiguously protected, for example, if they are identified by a domain name that domain name must not be used for services that do not enjoy specific protections under IHL.
+**Asset** An asset is a network-connected service that enjoys the specific protections under IHL.
+Assets must be unambiguously identifiable and unambiguously protected, for example, if they are identified by a domain name that domain name must not be used for services that do not enjoy specific protections under IHL.
 
 **Emblem issuer** An emblem issuer is an organization entitled to issue claims of protection for their digital infrastructure.
 
@@ -89,22 +89,22 @@ Beyond these terms, we use the terms "claim" and "header parameter" as reference
 
 ## Identifiers and their Semantics
 
-Emblems are issued for bearers by emblem issuers, which in turn are authorized by authorities.
+Emblems are issued for assets by emblem issuers, which in turn are authorized by authorities.
 Both emblem issuers and authorities are *organizations*.
-This section specifies how bearers and organizations are identified.
+This section specifies how assets and organizations are identified.
 
-### Bearer Identifiers
+### Asset Identifiers
 
-Bearers are identified by *bearer identifiers* (BIs).
-Bearer identifiers closely resemble Uniform Resource Identifiers (URIs) as specified in {{!RFC3986}}.
+Assets are identified by *asset identifiers* (AIs).
+Asset identifiers closely resemble Uniform Resource Identifiers (URIs) as specified in {{!RFC3986}}.
 However, to limit their scope, we do not follow the specification of URIs and instead define our own syntax.
 
 #### Syntax
 
-Bearer identifiers follow the syntax (`domain-name`, `IPv6` defined below):
+Asset identifiers follow the syntax (`domain-name`, `IPv6` defined below):
 
 ~~~~
-bearer-identifier = domain-name | "[" IPv6 "]"
+asset-identifier = domain-name | "[" IPv6 "]"
 ~~~~
 
 Domain names (`domain-name`) MUST be formatted as usual and specified in {{!RFC1035}} with the exception that the leftmost label MAY be the single-character wildcard `"*"`.
@@ -114,7 +114,7 @@ IPv6 addresses (`IPv6`) MUST be formatted following {{!RFC4291}}.
 IPv6 addresses MUST be global unicast or link-local unicast addresses.
 Note that the syntax of IPv6 addresses also support IPv4 addresses through "IPv4-Mapped IPv6 Addresses" (cf. {{!RFC4291}}, [Section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)).
 
-These are examples of BIs:
+These are examples of AIs:
 
 * `*.example.com`
 * `[2001:0db8::248:1893:25c8:1946]`
@@ -122,35 +122,35 @@ These are examples of BIs:
 
 #### Semantics
 
-Several kinds of bearers can be identified by bearer identifiers:
+Several kinds of assets can be identified by asset identifiers:
 
 * Network facing processes, e.g., web servers
 * Computational devices both in the virtual sense, e.g., a virtual machine, and in the physical sense, e.g., a laptop
 * Networks
 
-A BI identifies a set of IPv4 or IPv6 addresses:
+An AI identifies a set of IPv4 or IPv6 addresses:
 
-- If the BI is an IPv6 address, it identifies this address only.
-- If the BI an IPv6 address prefix, it identifies all IPv6 addresses matching that prefix.
-- If the BI is a domain name, it identifies any address for which there is an `A` or `AAAA` record for that domain name.
-- If the BI is a domain name starting with the wildcard `"*"`, it identifies any address for which there is an `A` or `AAAA` record for that domain name or any of its subdomains.
+- If the AI is an IPv6 address, it identifies this address only.
+- If the AI an IPv6 address prefix, it identifies all IPv6 addresses matching that prefix.
+- If the AI is a domain name, it identifies any address for which there is an `A` or `AAAA` record for that domain name.
+- If the AI is a domain name starting with the wildcard `"*"`, it identifies any address for which there is an `A` or `AAAA` record for that domain name or any of its subdomains.
 
-Any process reachable under any of the addresses pointed towards by `address` and on the port specified (or any port, if unspecified) is pointed by the respective BI.
+Any process reachable under any of the addresses pointed towards by `address` and on the port specified (or any port, if unspecified) is pointed by the respective AI.
 
 #### Order
 
-BIs may not only be used for identification but also for constraint purposes.
+AIs may not only be used for identification but also for constraint purposes.
 For example, an endorsement may constrain emblems to only signal protection for a specific IP address range.
-In this section, we define an order on BIs so that one can verify if an identifying BI complies with a constraining BI.
+In this section, we define an order on AIs so that one can verify if an identifying AI complies with a constraining AI.
 
-We define an BI A to be *more general* than an BI B, if all of the following conditions apply:
+We define an AI A to be *more general* than an AI B, if all of the following conditions apply:
 
 * If A encodes a domain name and does not contain the wildcard `"*"`, B encodes a domain name, too, and A is equal to B.
 * If A encodes a domain name and contains the wildcard `"*"`, B encodes a domain name, too, and B is a subdomain of A excluding the wildcard `"*"`.
 In this regard, any domain is considered a subdomain of itself.
 * If A encodes an IP address, B encodes an IP address, too, and A is a prefix of B.
 
-Note that BIs encoding a domain name are incomparable to BIs encoding IP addresses, i.e., neither can be more general than the other.
+Note that AIs encoding a domain name are incomparable to AIs encoding IP addresses, i.e., neither can be more general than the other.
 
 ### Organization Identifiers
 
@@ -183,7 +183,7 @@ See {{jwk-hashing}} for an example.
 
 ### Emblems {#emblems}
 
-An emblem is encoded either as JWS or as an unsecured JWT which signals protection of bearers.
+An emblem is encoded either as JWS or as an unsecured JWT which signals protection of assets.
 It is distinguished by the `cty` header parameter value which MUST be `"adem-emb"`.
 Its payload includes the JWT claims defined in the table below, following {{!RFC7519}}, [Section 4.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1).
 All other registered JWT claims MUST NOT be included.
@@ -195,10 +195,10 @@ All other registered JWT claims MUST NOT be included.
 | `nbf` | REQUIRED | As per {{!RFC7519}} | |
 | `exp` | REQUIRED | As per {{!RFC7519}} | |
 | `iss` | RECOMMENDED | Organization signaling protection | OI |
-| `bearers` | REQUIRED | BIs marked a protected | Array of BIs |
+| `assets` | REQUIRED | AIs marked a protected | Array of AIs |
 | `emb` | REQUIRED | Emblem details | JSON object (as follows) |
 
-Multiple BIs within `bearers` may be desirable, e.g., to include both a bearer's IPv4 and IPv6 address.
+Multiple AIs within `assets` may be desirable, e.g., to include both a asset's IPv4 and IPv6 address.
 The claim value of `emb` MUST be a JSON {{!RFC8259}} object with the following key-value mappings.
 
 | Claim | Status | Semantics | Encoding |
@@ -238,14 +238,14 @@ Payload:
   "nbf": 1672916137,
   "exp": 1675590932,
   "iss": "https://example.com",
-  "bearers": ["[2001:0db8:582:ae33::29]"]
+  "assets": ["[2001:0db8:582:ae33::29]"]
 }
 ~~~~
 
 ### Endorsements
 
 Endorsements are encoded as JWSs.
-Endorsements attest two statements: that a public key is affiliated with an organization, pointed to by OIs, and that this organization is eligible to issue emblems for their bearers.
+Endorsements attest two statements: that a public key is affiliated with an organization, pointed to by OIs, and that this organization is eligible to issue emblems for their assets.
 They are distinguished by the `cty` header parameter value which MUST be `"adem-end"`.
 An endorsement's payload includes the JWT claims defined in the table below.
 All otger registered JWT claims MUST NOT be included.
@@ -279,7 +279,7 @@ The semantics of these fields are defined in {{!RFC6962}} for `v1` and {{!RFC916
 | ----- | ------ | --------- | -------- |
 | `prp` | OPTIONAL | Purpose constraint | Array of `purpose` |
 | `dst` | OPTIONAL | Distribution method constraint | Array of `distribution-method` |
-| `bearers` | OPTIONAL | Bearer constraint | Array of BIs |
+| `assets` | OPTIONAL | Asset constraint | Array of AIs |
 | `wnd` | OPTIONAL | Maximum emblem lifetime | Integer |
 
 We say that an endorsement *endorses* a token if its `key` claim equals the token's verification key, and its `sub` claim equals the token's `iss` claim.
@@ -289,7 +289,7 @@ We say that an emblem is *valid* with respect to an endorsement if all the follo
 
 * The endorsement's `emb.prp` claim is undefined or a superset of the emblem's `emb.prp` claim.
 * The endorsement's `emb.dst` claim is undefined or a superset of the emblem's `emb.dst` claim.
-* The endorsement's `emb.bearers` claim is undefined or for each BI within the emblem's `emb.bearers` claim, there exists an BI within the endorsement's `emb.bearers` claim which is more general than the emblem's `emb.bearers` claim.
+* The endorsement's `emb.assets` claim is undefined or for each AI within the emblem's `emb.assets` claim, there exists an AI within the endorsement's `emb.assets` claim which is more general than the emblem's `emb.assets` claim.
 * The endorsement's `emb.wnd` claim is undefined or the sum of emblem's `nbf` and the endorsement's `emb.wnd` claims is greater than or equal to the emblem's `exp` claim.
 
 # Public Key Commitment {#pk-distribution}
@@ -359,7 +359,7 @@ The set of OIs returned by the verification procedure encodes the OIs of endorsi
 We strongly RECOMMEND against accepting emblems resulting in `SIGNED-UNTRUSTED`.
 In such cases, validators should aim to authenticate the respective public keys via other, out-of-band methods.
 This effectively lifts the result to `SIGNED-TRUSTED`.
-Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public key, but might not be able to set up a signing infrastructure linking their bearers to a root key.
+Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public key, but might not be able to set up a signing infrastructure linking their assets to a root key.
 
 There is no definite guideline on how to choose which keys to trust, i.e., which keys to pass as trusted public key to the verification procedure.
 Some validators may have pre-existing trust relationships with some authorities, e.g., military units of a nation state could use the public keys of their nation state or allies.
@@ -367,7 +367,7 @@ Other validators might be fine with fetching public keys authenticated only by t
 
 ## Protection
 
-An emblem for which the verification procedure produces a result other than `INVALID` marks any asset whose address is identified by at least one of the emblem's BIs.
+An emblem for which the verification procedure produces a result other than `INVALID` marks any asset whose address is identified by at least one of the emblem's AIs.
 Such an emblem signals that the respective asset is enjoys the specific protections of IHL.
 
 Emblem issuers MUST only issue emblems for assets that are used only for protected purposes.
