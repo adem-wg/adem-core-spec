@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-15T01:20:20.197265+00:00",
+  "timestamp": "2026-01-18T01:27:50.287465+00:00",
   "repo": "adem-wg/adem-core-spec",
   "labels": [
     {
@@ -49,6 +49,39 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOQPTiCc7jwaDr",
+      "title": "Always recompute KID",
+      "url": "https://github.com/adem-wg/adem-core-spec/issues/1",
+      "state": "OPEN",
+      "author": "felixlinker",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently, the spec requires that all JWKs have the kid set. This is not optimal and a potential attack vector. Instead, we should *never* include the kid to force implementations to recompute it.",
+      "createdAt": "2026-01-16T09:16:14Z",
+      "updatedAt": "2026-01-16T09:16:14Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 2,
+      "id": "I_kwDOQPTiCc7jww8N",
+      "title": "Distribution channels are outdated",
+      "url": "https://github.com/adem-wg/adem-core-spec/issues/2",
+      "state": "OPEN",
+      "author": "felixlinker",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The spec supports TLS, UDP, and DNS as distribution channels, but currently, only DNS makes sense.",
+      "createdAt": "2026-01-16T09:37:48Z",
+      "updatedAt": "2026-01-16T09:37:48Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": []
 }
