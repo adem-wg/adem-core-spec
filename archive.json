@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-02T01:57:08.631913+00:00",
+  "timestamp": "2026-04-05T02:04:17.831872+00:00",
   "repo": "adem-wg/adem-core-spec",
   "labels": [
     {
@@ -79,6 +79,22 @@
       "body": "The spec supports TLS, UDP, and DNS as distribution channels, but currently, only DNS makes sense.",
       "createdAt": "2026-01-16T09:37:48Z",
       "updatedAt": "2026-01-16T09:37:48Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 3,
+      "id": "I_kwDOQPTiCc755e3_",
+      "title": "alg field in JWK?",
+      "url": "https://github.com/adem-wg/adem-core-spec/issues/3",
+      "state": "OPEN",
+      "author": "felixlinker",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I use the `alg` field aggressively to force that keys are used for the same algorithms as the signature. However, this field is not set by the jwx library when parsing, e.g., PEM keys, and requires me to constantly carry the `-alg` and `-pk-alg` arguments around. Reading [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) again, I realized that signature keys do not even seem to support the `alg` field. I wonder whether I should drop this. Note: This is a breaking change as the key hashes will change.",
+      "createdAt": "2026-04-02T07:55:45Z",
+      "updatedAt": "2026-04-02T07:55:45Z",
       "closedAt": null,
       "comments": []
     }
