@@ -178,7 +178,8 @@ Any token MUST include the `cty` (content type) header parameter.
 Keys are encoded as JSON Web Keys (JWKs) {{!RFC7517}}.
 In context of ADEM, keys MUST include the `alg` parameter.
 We identify keys using their key identifier `kid`.
-Whenever a JWK in context of ADEM contains the `kid` parameter, it MUST be computed as per {{jwk-hashing}}.
+Key identifiers are computed as per {{jwk-hashing}}.
+JWKs in context of ADEM MUST NOT contain the `kid` parameter, which forces implementations to compute and thus verify the value themselves.
 See {{jwk-hashing}} for an example.
 
 ### Emblems {#emblems}
@@ -384,7 +385,7 @@ Context:
 Algorithm:
 
 1. Parse the JWK as JSON object.
-2. Drop the `kid` parameter from the JWK.
+2. Drop the `kid` parameter from the JWK if present.
 3. Compute the key's thumbprint using SHA-256 as per {{!RFC7638}}.
 4. Return the digest in base32 encoding as per {{!RFC4648}} in all lower-case and with trailing `=` removed.
 
