@@ -1430,7 +1430,7 @@ For example, <code>https://example.com</code> is a valid OI, but <code>https://E
         <h3 id="name-token-encoding">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-token-encoding" class="section-name selfRef">Token Encoding</a>
         </h3>
-<p id="section-3.2-1">Tokens <span class="bcp14">MUST</span> be encoded as a JWS <span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span> or as an unsecured JWT as defined in <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>, <a href="https://datatracker.ietf.org/doc/html/rfc7519#section-6">Section 6</a>, encoded either in compact serialization or as signed CBOR Web Token (CWT) <span>[<a href="#RFC8392" class="cite xref">RFC8392</a>]</span>.
+<p id="section-3.2-1">Tokens <span class="bcp14">MUST</span> be encoded as a JWS <span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span>.
 Tokens encoded as JWS <span class="bcp14">MUST</span> only use JWS protected headers and <span class="bcp14">MUST</span> include either the <code>jwk</code> or the <code>kid</code> header parameter, which <span class="bcp14">MUST</span> identify the respective verification key.
 Any token <span class="bcp14">MUST</span> include the <code>cty</code> (content type) header parameter.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <div id="key-identifiers-and-key-formats">
@@ -1451,7 +1451,7 @@ See <a href="#jwk-hashing" class="auto internal xref">Section 6.1</a> for an exa
           <h4 id="name-emblems">
 <a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-emblems" class="section-name selfRef">Emblems</a>
           </h4>
-<p id="section-3.2.2-1">An emblem is encoded either as JWS or as an unsecured JWT which signals protection of assets.
+<p id="section-3.2.2-1">An emblem is encoded as a JWS and signals the protection of assets.
 It is distinguished by the <code>cty</code> header parameter value which <span class="bcp14">MUST</span> be <code>"adem-emb"</code>.
 Its payload includes the JWT claims defined in the table below, following <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>, <a href="https://datatracker.ietf.org/doc/html/rfc7519#section-4.1">Section 4.1</a>.
 All other registered JWT claims <span class="bcp14">MUST NOT</span> be included.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
@@ -1582,7 +1582,7 @@ The claim value of <code>emb</code> <span class="bcp14">MUST</span> be a JSON <s
 <pre>
   purpose = "protective" | "indicative"
 
-  distribution-method = "dns" | "icmp" | "udp"
+  distribution-method = "dns"
 </pre><a href="#section-3.2.2-5" class="pilcrow">¶</a>
 </div>
 <div id="example">
@@ -1605,8 +1605,9 @@ The claim value of <code>emb</code> <span class="bcp14">MUST</span> be a JSON <s
 <div class="lang-json sourcecode" id="section-3.2.2.1-5">
 <pre>
 {
+  "ver": "v1",
   "emb": {
-    "dst": ["icmp"],
+    "dst": ["dns"],
     "prp": ["protective"]
   },
   "iat": 1672916137,
@@ -1630,7 +1631,7 @@ The claim value of <code>emb</code> <span class="bcp14">MUST</span> be a JSON <s
 Endorsements attest two statements: that a public key is affiliated with an organization, pointed to by OIs, and that this organization is eligible to issue emblems for their assets.
 They are distinguished by the <code>cty</code> header parameter value which <span class="bcp14">MUST</span> be <code>"adem-end"</code>.
 An endorsement's payload includes the JWT claims defined in the table below.
-All otger registered JWT claims <span class="bcp14">MUST NOT</span> be included.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+Any other registered JWT claims <span class="bcp14">MUST NOT</span> be included.<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-3">
             <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
 <thead>
@@ -2227,7 +2228,7 @@ Practically speaking, this implies that parties can only go beyond pure public k
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-token-order" class="section-name selfRef">Token Order</a>
         </h3>
 <p id="section-7.2-1">As specified in <a href="#signed-emblems" class="auto internal xref">Section 6.2</a>, clients <span class="bcp14">MAY</span> reject sets of tokens as invalid if the order of tokens as indicated by the sending client does not yield a valid chain of endorsements.
-This allows an adversary to force rejection of a set of tokens by altering, e.g., sequence numbers on non-integrity protected channels such as UDP.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+This allows an adversary to force rejection of a set of tokens by altering, e.g., sequence numbers on non-integrity protected channels.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <p id="section-7.2-2">However, this does not constitute a new attack.
 Such adversaries could flip a bit in the emblem's signature, rendering the set of tokens invalid, too.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
 </section>
@@ -2304,10 +2305,6 @@ This is ensured by computing it using SHA-256.<a href="#section-7.3-1" class="pi
 <dt id="RFC8259">[RFC8259]</dt>
       <dd>
 <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC8392">[RFC8392]</dt>
-      <dd>
-<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Wahlstroem, E.</span>, <span class="refAuthor">Erdtman, S.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"CBOR Web Token (CWT)"</span>, <span class="seriesInfo">RFC 8392</span>, <span class="seriesInfo">DOI 10.17487/RFC8392</span>, <time datetime="2018-05" class="refDate">May 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8392">https://www.rfc-editor.org/rfc/rfc8392</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9162">[RFC9162]</dt>
       <dd>

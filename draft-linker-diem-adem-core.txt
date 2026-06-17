@@ -275,14 +275,11 @@ Table of Contents
 
 3.2.  Token Encoding
 
-   Tokens MUST be encoded as a JWS [RFC7515] or as an unsecured JWT as
-   defined in [RFC7519], Section 6
-   (https://datatracker.ietf.org/doc/html/rfc7519#section-6), encoded
-   either in compact serialization or as signed CBOR Web Token (CWT)
-   [RFC8392].  Tokens encoded as JWS MUST only use JWS protected headers
-   and MUST include either the jwk or the kid header parameter, which
-   MUST identify the respective verification key.  Any token MUST
-   include the cty (content type) header parameter.
+   Tokens MUST be encoded as a JWS [RFC7515].  Tokens encoded as JWS
+   MUST only use JWS protected headers and MUST include either the jwk
+   or the kid header parameter, which MUST identify the respective
+   verification key.  Any token MUST include the cty (content type)
+   header parameter.
 
 3.2.1.  Key Identifiers and Key Formats
 
@@ -295,12 +292,12 @@ Table of Contents
 
 3.2.2.  Emblems
 
-   An emblem is encoded either as JWS or as an unsecured JWT which
-   signals protection of assets.  It is distinguished by the cty header
-   parameter value which MUST be "adem-emb".  Its payload includes the
-   JWT claims defined in the table below, following [RFC7519],
-   Section 4.1 (https://datatracker.ietf.org/doc/html/rfc7519#section-
-   4.1).  All other registered JWT claims MUST NOT be included.
+   An emblem is encoded as a JWS and signals the protection of assets.
+   It is distinguished by the cty header parameter value which MUST be
+   "adem-emb".  Its payload includes the JWT claims defined in the table
+   below, following [RFC7519], Section 4.1
+   (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1).  All
+   other registered JWT claims MUST NOT be included.
 
       +========+=============+======================+==============+
       | Claim  | Status      | Semantics            | Encoding     |
@@ -344,7 +341,7 @@ Table of Contents
 
      purpose = "protective" | "indicative"
 
-     distribution-method = "dns" | "icmp" | "udp"
+     distribution-method = "dns"
 
 3.2.2.1.  Example
 
@@ -362,8 +359,9 @@ Table of Contents
    Payload:
 
    {
+     "ver": "v1",
      "emb": {
-       "dst": ["icmp"],
+       "dst": ["dns"],
        "prp": ["protective"]
      },
      "iat": 1672916137,
@@ -380,7 +378,7 @@ Table of Contents
    pointed to by OIs, and that this organization is eligible to issue
    emblems for their assets.  They are distinguished by the cty header
    parameter value which MUST be "adem-end".  An endorsement's payload
-   includes the JWT claims defined in the table below.  All otger
+   includes the JWT claims defined in the table below.  Any other
    registered JWT claims MUST NOT be included.
 
      +=======+=============+=========================+==============+
@@ -779,7 +777,7 @@ Table of Contents
    invalid if the order of tokens as indicated by the sending client
    does not yield a valid chain of endorsements.  This allows an
    adversary to force rejection of a set of tokens by altering, e.g.,
-   sequence numbers on non-integrity protected channels such as UDP.
+   sequence numbers on non-integrity protected channels.
 
    However, this does not constitute a new attack.  Such adversaries
    could flip a bit in the emblem's signature, rendering the set of
@@ -847,10 +845,6 @@ Table of Contents
               Interchange Format", STD 90, RFC 8259,
               DOI 10.17487/RFC8259, December 2017,
               <https://www.rfc-editor.org/rfc/rfc8259>.
-
-   [RFC8392]  Jones, M., Wahlstroem, E., Erdtman, S., and H. Tschofenig,
-              "CBOR Web Token (CWT)", RFC 8392, DOI 10.17487/RFC8392,
-              May 2018, <https://www.rfc-editor.org/rfc/rfc8392>.
 
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
