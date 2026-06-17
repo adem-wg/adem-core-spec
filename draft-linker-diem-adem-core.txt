@@ -3,9 +3,9 @@
 
 
 Digital Emblems                                                F. Linker
-Internet-Draft                                           15 January 2026
+Internet-Draft                                              17 June 2026
 Intended status: Informational                                          
-Expires: 19 July 2026
+Expires: 19 December 2026
 
 
                         ADEM Core Specification
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 July 2026.
+   This Internet-Draft will expire on 19 December 2026.
 
 Copyright Notice
 
@@ -280,16 +280,18 @@ Table of Contents
    (https://datatracker.ietf.org/doc/html/rfc7519#section-6), encoded
    either in compact serialization or as signed CBOR Web Token (CWT)
    [RFC8392].  Tokens encoded as JWS MUST only use JWS protected headers
-   and MUST include the jwk header parameter.  Any token MUST include
-   the cty (content type) header parameter.
+   and MUST include either the jwk or the kid header parameter, which
+   MUST identify the respective verification key.  Any token MUST
+   include the cty (content type) header parameter.
 
 3.2.1.  Key Identifiers and Key Formats
 
    Keys are encoded as JSON Web Keys (JWKs) [RFC7517].  In context of
    ADEM, keys MUST include the alg parameter.  We identify keys using
-   their key identifier kid.  Whenever a JWK in context of ADEM contains
-   the kid parameter, it MUST be computed as per Section 6.1.  See
-   Section 6.1 for an example.
+   their key identifier kid.  Key identifiers are computed as per
+   Section 6.1.  JWKs in context of ADEM MUST NOT contain the kid
+   parameter, which forces implementations to compute and thus verify
+   the value themselves.  See Section 6.1 for an example.
 
 3.2.2.  Emblems
 
@@ -632,7 +634,7 @@ Table of Contents
 
    1.  Parse the JWK as JSON object.
 
-   2.  Drop the kid parameter from the JWK.
+   2.  Drop the kid parameter from the JWK if present.
 
    3.  Compute the key's thumbprint using SHA-256 as per [RFC7638].
 
