@@ -253,7 +253,7 @@ Endorsements are encoded as JWSs.
 Endorsements attest two statements: that a public key is affiliated with an organization, pointed to by OIs, and that this organization is eligible to issue emblems for their assets.
 They are distinguished by the `cty` header parameter value which MUST be `"adem-end"`.
 An endorsement's payload includes the JWT claims defined in the table below.
-All otger registered JWT claims MUST NOT be included.
+Any other registered JWT claims MUST NOT be included.
 
 | Claim | Status | Semantics | Encoding |
 | ----- | ------ | --------- | -------- |
