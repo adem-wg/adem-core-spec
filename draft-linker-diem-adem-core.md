@@ -173,7 +173,7 @@ For example, `https://example.com` is a valid OI, but `https://EXAMPLE.COM` is n
 
 ## Token Encoding
 
-Tokens MUST be encoded as a JWS {{!RFC7515}} or as an unsecured JWT as defined in {{!RFC7519}}, [Section 6](https://datatracker.ietf.org/doc/html/rfc7519#section-6), encoded either in compact serialization or as signed CBOR Web Token (CWT) {{!RFC8392}}.
+Tokens MUST be encoded as a JWS {{!RFC7515}}.
 Tokens encoded as JWS MUST only use JWS protected headers and MUST include either the `jwk` or the `kid` header parameter, which MUST identify the respective verification key.
 Any token MUST include the `cty` (content type) header parameter.
 
@@ -188,7 +188,7 @@ See {{jwk-hashing}} for an example.
 
 ### Emblems {#emblems}
 
-An emblem is encoded either as JWS or as an unsecured JWT which signals protection of assets.
+An emblem is encoded as a JWS and signals the protection of assets.
 It is distinguished by the `cty` header parameter value which MUST be `"adem-emb"`.
 Its payload includes the JWT claims defined in the table below, following {{!RFC7519}}, [Section 4.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1).
 All other registered JWT claims MUST NOT be included.
