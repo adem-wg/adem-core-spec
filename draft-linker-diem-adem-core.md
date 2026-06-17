@@ -235,6 +235,7 @@ Payload:
 
 ~~~~json
 {
+  "ver": "v1",
   "emb": {
     "dst": ["dns"],
     "prp": ["protective"]
