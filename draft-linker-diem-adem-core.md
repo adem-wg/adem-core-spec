@@ -28,6 +28,10 @@ author:
     email: "linkerfelix@gmail.com"
 
 normative:
+  STATIC-CT:
+    target: https://github.com/C2SP/C2SP/blob/0f3fddde7d1d8bd55e42723572c4c144457c50d0/static-ct-api.md
+    title: The Static Certificate Transparency API
+    date: 2026-03-20
 
 informative:
 
@@ -266,11 +270,11 @@ All otger registered JWT claims MUST NOT be included.
 
 If an endorsement was signed by a root key, it MUST include `log`.
 `log` maps to an array of JSON objects with the following claims.
-The semantics of these fields are defined in {{!RFC6962}} for `v1` and {{!RFC9162}} for `v2`.
+The semantics of these fields are defined in {{!RFC6962}} for `v1` and {{STATIC-CT}} for `static`.
 
 | Claim | Status | Semantics | Encoding |
 | ----- | ------ | --------- | -------- |
-| `ver` | REQUIRED | CT log version | `"v1"` or `"v2"` |
+| `ver` | REQUIRED | CT log version | `"v1"` or `"static"` |
 | `id`  | REQUIRED | The CT log's ID | Base64-encoded string |
 | `hash` | REQUIRED | The binding certificate's leaf hash in the log | Base64-encoded string |
 
