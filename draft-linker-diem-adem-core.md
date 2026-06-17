@@ -213,7 +213,7 @@ The claim value of `emb` MUST be a JSON {{!RFC8259}} object with the following k
 
       purpose = "protective" | "indicative"
 
-      distribution-method = "dns" | "icmp" | "udp"
+      distribution-method = "dns"
 
 <!-- TODO: Explain distribution methods -->
 
@@ -236,7 +236,7 @@ Payload:
 ~~~~json
 {
   "emb": {
-    "dst": ["icmp"],
+    "dst": ["dns"],
     "prp": ["protective"]
   },
   "iat": 1672916137,
@@ -474,7 +474,7 @@ These properties stem from parties needing to include a hash of their key in a T
 ## Token Order
 
 As specified in {{signed-emblems}}, clients MAY reject sets of tokens as invalid if the order of tokens as indicated by the sending client does not yield a valid chain of endorsements.
-This allows an adversary to force rejection of a set of tokens by altering, e.g., sequence numbers on non-integrity protected channels such as UDP.
+This allows an adversary to force rejection of a set of tokens by altering, e.g., sequence numbers on non-integrity protected channels.
 
 However, this does not constitute a new attack.
 Such adversaries could flip a bit in the emblem's signature, rendering the set of tokens invalid, too.
