@@ -1751,7 +1751,7 @@ All otger registered JWT claims <span class="bcp14">MUST NOT</span> be included.
           </table>
 <p id="section-3.2.3-3">If an endorsement was signed by a root key, it <span class="bcp14">MUST</span> include <code>log</code>.
 <code>log</code> maps to an array of JSON objects with the following claims.
-The semantics of these fields are defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> for <code>v1</code> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> for <code>v2</code>.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
+The semantics of these fields are defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> for <code>v1</code> and <span>[<a href="#STATIC-CT" class="cite xref">STATIC-CT</a>]</span> for <code>static</code>.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
 <table class="center" id="table-4">
             <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
 <thead>
@@ -1772,7 +1772,7 @@ The semantics of these fields are defined in <span>[<a href="#RFC6962" class="ci
 </td>
                 <td class="text-left" rowspan="1" colspan="1">CT log version</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <code>"v1"</code> or <code>"v2"</code>
+                  <code>"v1"</code> or <code>"static"</code>
 </td>
               </tr>
               <tr>
@@ -2310,8 +2310,12 @@ This is ensured by computing it using SHA-256.<a href="#section-7.3-1" class="pi
 <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Wahlstroem, E.</span>, <span class="refAuthor">Erdtman, S.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"CBOR Web Token (CWT)"</span>, <span class="seriesInfo">RFC 8392</span>, <span class="seriesInfo">DOI 10.17487/RFC8392</span>, <time datetime="2018-05" class="refDate">May 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8392">https://www.rfc-editor.org/rfc/rfc8392</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9162">[RFC9162]</dt>
-    <dd>
+      <dd>
 <span class="refAuthor">Laurie, B.</span>, <span class="refAuthor">Messeri, E.</span>, and <span class="refAuthor">R. Stradling</span>, <span class="refTitle">"Certificate Transparency Version 2.0"</span>, <span class="seriesInfo">RFC 9162</span>, <span class="seriesInfo">DOI 10.17487/RFC9162</span>, <time datetime="2021-12" class="refDate">December 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9162">https://www.rfc-editor.org/rfc/rfc9162</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="STATIC-CT">[STATIC-CT]</dt>
+    <dd>
+<span class="refTitle">"The Static Certificate Transparency API"</span>, <time datetime="2026-03-20" class="refDate">20 March 2026</time>, <span>&lt;<a href="https://github.com/C2SP/C2SP/blob/0f3fddde7d1d8bd55e42723572c4c144457c50d0/static-ct-api.md">https://github.com/C2SP/C2SP/blob/0f3fddde7d1d8bd55e42723572c4c144457c50d0/static-ct-api.md</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>

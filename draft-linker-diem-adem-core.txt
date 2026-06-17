@@ -417,19 +417,19 @@ Table of Contents
    If an endorsement was signed by a root key, it MUST include log. log
    maps to an array of JSON objects with the following claims.  The
    semantics of these fields are defined in [RFC6962] for v1 and
-   [RFC9162] for v2.
+   [STATIC-CT] for static.
 
-     +=======+==========+===========================+================+
-     | Claim | Status   | Semantics                 | Encoding       |
-     +=======+==========+===========================+================+
-     | ver   | REQUIRED | CT log version            | "v1" or "v2"   |
-     +-------+----------+---------------------------+----------------+
-     | id    | REQUIRED | The CT log's ID           | Base64-encoded |
-     |       |          |                           | string         |
-     +-------+----------+---------------------------+----------------+
-     | hash  | REQUIRED | The binding certificate's | Base64-encoded |
-     |       |          | leaf hash in the log      | string         |
-     +-------+----------+---------------------------+----------------+
+    +=======+==========+===========================+==================+
+    | Claim | Status   | Semantics                 | Encoding         |
+    +=======+==========+===========================+==================+
+    | ver   | REQUIRED | CT log version            | "v1" or "static" |
+    +-------+----------+---------------------------+------------------+
+    | id    | REQUIRED | The CT log's ID           | Base64-encoded   |
+    |       |          |                           | string           |
+    +-------+----------+---------------------------+------------------+
+    | hash  | REQUIRED | The binding certificate's | Base64-encoded   |
+    |       |          | leaf hash in the log      | string           |
+    +-------+----------+---------------------------+------------------+
 
                                   Table 4
 
@@ -855,6 +855,12 @@ Table of Contents
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
+
+   [STATIC-CT]
+              "The Static Certificate Transparency API", 20 March 2026,
+              <https://github.com/C2SP/C2SP/
+              blob/0f3fddde7d1d8bd55e42723572c4c144457c50d0/static-ct-
+              api.md>.
 
 Author's Address
 
