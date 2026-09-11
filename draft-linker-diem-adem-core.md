@@ -11,9 +11,6 @@ v: 3
 area: "Applications and Real-Time"
 workgroup: "Digital Emblems"
 keyword:
- - next generation
- - unicorn
- - sparkling distributed ledger
 venue:
   group: "Digital Emblems"
   type: "Working Group"
