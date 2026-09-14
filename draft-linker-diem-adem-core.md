@@ -38,7 +38,7 @@ informative:
 
 In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
 This enables military units to identify assets as respected and protected under international humanitarian law.
-This draft specifies the format and trust architecture of a protective, digital emblem to network-connected infrastructure.
+This draft specifies the format and trust architecture of a protective, digital emblem for network-connected infrastructure.
 Such emblems mark assets as protected under IHL analogously to the physical emblems.
 
 --- middle
@@ -50,9 +50,9 @@ The emblems of the red cross, red crescent, and red crystal are used to mark phy
 This document specifies the structure and trust model of digital emblems for IHL that can be used to mark digital infrastructure as protected under IHL analogously to the physical emblems.
 We call this system *ADEM*, which stands for an Authentic Digital EMblem.
 
-In ADEM, emblems are signed statements that mark a *assets* as proteced under IHL.
+In ADEM, emblems are signed statements that mark *assets* as protected under IHL.
 Emblems are issued by *emblem issuers*.
-Emblem issuer can be authorized by *authorities*.
+Emblem issuers can be authorized by *authorities*.
 Authorities do so by signing *endorsements* for emblem issuers.
 We call both emblems and endorsements *tokens*.
 Emblems are consumed and validated by *validators*.
@@ -80,7 +80,7 @@ Assets must be unambiguously identifiable and unambiguously protected, for examp
 This trust may stem from law.
 For example, nation states or NGOs can take the role of authorities.
 
-**Organization** An emblem issuer or autority.
+**Organization** An emblem issuer or authority.
 
 **Validator** A validator is an agent interested in observing and verifying digital emblems.
 
@@ -113,7 +113,7 @@ In particular, `"*"` itself is a valid domain name in context of this specificat
 
 IPv6 addresses (`IPv6`) MUST be formatted following {{!RFC4291}}.
 IPv6 addresses MUST be global unicast or link-local unicast addresses.
-Note that the syntax of IPv6 addresses also support IPv4 addresses through "IPv4-Mapped IPv6 Addresses" (cf. {{!RFC4291}}, [Section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)).
+Note that the syntax of IPv6 addresses also supports IPv4 addresses through "IPv4-Mapped IPv6 Addresses" (cf. {{!RFC4291}}, [Section 2.5.5.2](https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.5.2)).
 
 These are examples of AIs:
 
@@ -132,7 +132,7 @@ Several kinds of assets can be identified by asset identifiers:
 An AI identifies a set of IPv4 or IPv6 addresses:
 
 - If the AI is an IPv6 address, it identifies this address only.
-- If the AI an IPv6 address prefix, it identifies all IPv6 addresses matching that prefix.
+- If the AI is an IPv6 address prefix, it identifies all IPv6 addresses matching that prefix.
 - If the AI is a domain name, it identifies any address for which there is an `A` or `AAAA` record for that domain name.
 - If the AI is a domain name starting with the wildcard `"*"`, it identifies any address for which there is an `A` or `AAAA` record for that domain name or any of its subdomains.
 
@@ -184,7 +184,7 @@ Keys are encoded as COSE_Key structures {{!RFC9052}} and MUST include the `alg` 
 The key's `alg` value MUST equal the `alg` value in the protected header of each token signed with that key.
 
 We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in {{!RFC9679}}.
-To force computation and thus verification if key identifiers, COSE_Key structures in the context of ADEM SHOULD NOT contain the `kid` parameter (label 2).
+To force computation and thus verification of key identifiers, COSE_Key structures in the context of ADEM SHOULD NOT contain the `kid` parameter (label 2).
 Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter and MUST verify the `kid` parameter by recomputing it.
 
 Key identifiers are encoded as a CBOR byte string when used as the COSE `kid` header parameter or as a CWT claim value.
@@ -335,7 +335,7 @@ We say that an emblem is *valid* with respect to an endorsement if all the follo
 # Public Key Commitment {#pk-distribution}
 
 Parties must undeniably link their root public keys to their OI.
-In this section, we specify the configuration of a emblem issuer's OI.
+In this section, we specify the configuration of an emblem issuer's OI.
 Root public keys are all public keys which are only endorsed by third parties and never endorsed by the organization itself.
 A party MAY have multiple root public keys.
 For a root public key to be configured correctly, there MUST be an X.509 certificate that:
@@ -343,7 +343,7 @@ For a root public key to be configured correctly, there MUST be an X.509 certifi
 * MUST NOT be revoked
 * MUST be logged in the Certificate Transparency logs {{!RFC6962}}, {{!RFC9162}}
   * Note that log inclusion requires a valid certificate chain that leads to
-  one of the logs accepted root certificates. Clients are RECOMMENDED to verify
+  one of the log's accepted root certificates. Clients are RECOMMENDED to verify
   that this chain is valid and that none of the certificates along it have been
   revoked.
 * MUST be valid for at least all the following domains (`<OI>` is understood to be a placeholder for the domain name in the party's OI):
@@ -364,7 +364,7 @@ Hence, parties MUST configure the website hosted under their OI to provide suffi
 
 Whenever a validator receives an emblem, they MAY check if it is valid.
 The validity of an emblem is defined with respect to a public key.
-A validity checking algorithm MUST returns the following values.
+A validity checking algorithm MUST return the following values.
 The order of these values encodes the *strength* of the verification result.
 
 1. `INVALID`
@@ -378,7 +378,7 @@ The order of these values encodes the *strength* of the verification result.
 Given an input public key and an emblem with a set of endorsements, a verification algorithm takes the following steps:
 
 1. Run the *signed emblem verification procedure* ({{signed-emblems}}; results in one of `SIGNED-TRUSTED`, `SIGNED-UNTRUSTED`, or `INVALID`).
-2. If previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last verification procedure's result and the emtpy set of OIs.
+2. If previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last verification procedure's result and the empty set of OIs.
 3. Run the *organizational emblem verification procedure* ({{org-emblems}}; results in one of `ORGANIZATIONAL-TRUSTED`, `ORGANIZATIONAL-UNTRUSTED`, `INVALID`).
 4. If the previous procedure resulted in `INVALID` return `INVALID` and the empty set of OIs.
 5. If all tokens include the same `iss` claim, return the strongest return value matching `*-TRUSTED`, the strongest return value matching `*-UNTRUSTED` provided that it is strictly stronger than the strongest return value matching `*-TRUSTED`, and the empty set of OIs.
@@ -388,7 +388,7 @@ Given an input public key and an emblem with a set of endorsements, a verificati
 
 Note that the endorsed emblem verification procedure resulting in `INVALID` is handled implicitly in step 8.
 As the procedure did not terminate in step 5, organizational verification must have been successful.
-Hence, `INVALID` cannot be the strongest return value, and an emblem not being accompanied by valid endorsements are downgraded to organizational emblems.
+Hence, `INVALID` cannot be the strongest return value, and an emblem not being accompanied by valid endorsements is downgraded to organizational emblems.
 
 The set of OIs returned by the verification procedure encodes the OIs of endorsing parties where verification passed.
 
@@ -397,7 +397,7 @@ The set of OIs returned by the verification procedure encodes the OIs of endorsi
 We strongly RECOMMEND against accepting emblems resulting in `SIGNED-UNTRUSTED`.
 In such cases, validators should aim to authenticate the respective public keys via other, out-of-band methods.
 This effectively lifts the result to `SIGNED-TRUSTED`.
-Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public key, but might not be able to set up a signing infrastructure linking their assets to a root key.
+Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public keys, but might not be able to set up a signing infrastructure linking their assets to a root key.
 
 There is no definite guideline on how to choose which keys to trust, i.e., which keys to pass as trusted public key to the verification procedure.
 Some validators may have pre-existing trust relationships with some authorities, e.g., military units of a nation state could use the public keys of their nation state or allies.
@@ -406,7 +406,7 @@ Other validators might be fine with fetching public keys authenticated only by t
 ## Protection
 
 An emblem for which the verification procedure produces a result other than `INVALID` marks any asset whose address is identified by at least one of the emblem's AIs.
-Such an emblem signals that the respective asset is enjoys the specific protections of IHL.
+Such an emblem signals that the respective asset enjoys the specific protections of IHL.
 
 Emblem issuers MUST only issue emblems for assets that are used only for protected purposes.
 
@@ -456,7 +456,7 @@ If the top-most endorsing key is equal to the trusted input public key, return `
 Context:
 
 * Assumptions: Organizational emblem verification has been performed and did not return `INVALID`.
-There are emblems as part of the input including an `iss` claim different to the emblem's `iss` claim.
+There are endorsements as part of the input including an `iss` claim different to the emblem's `iss` claim.
 * Input: An emblem, a set of endorsements, and a trusted public key.
 * Output: `ENDORSED-TRUSTED`, `ENDORSED-UNTRUSTED`, or `INVALID`, and a set of OIs.
 
@@ -483,7 +483,7 @@ In both the latter cases, also return the set of all `iss` claims of the remaini
 The procedures to verify organizational or endorsed emblems as specified in {{org-emblems}} and {{endorsed-emblems}} assume that the emblem's `iss` claim is defined.
 Practically speaking, this implies that parties can only go beyond pure public key authentication (where public keys need to be authenticated out-of-band) by stating an OI.
 
-The constraints on well-configured OIs offers two beneficial security properties:
+The constraints on well-configured OIs offer two beneficial security properties:
 
 * Parties cannot equivocate their keys, i.e., they need to commit to a consistent set of keys.
 * Parties cannot deny having used certain root public keys.
