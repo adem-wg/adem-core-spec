@@ -61,7 +61,7 @@ Emblems are consumed and validated by *validators*.
 
 {::boilerplate bcp14-tagged}
 
-**Token** A token is either an emblem or an endorsement and encoded as a JWS.
+**Token** A token is either an emblem or an endorsement and is encoded as a signed CBOR Web Token (CWT).
 
 **Emblem** An emblem is a sign of protection under IHL.
 
@@ -84,7 +84,7 @@ For example, nation states or NGOs can take the role of authorities.
 
 **Validator** A validator is an agent interested in observing and verifying digital emblems.
 
-Beyond these terms, we use the terms "claim" and "header parameter" as references to the JWT specification {{!RFC7519}}.
+Beyond these terms, we use the terms "claim", "claim key", "claim value", and "CWT Claims Set" as defined in {{!RFC8392}}, and "header parameter" as defined in {{!RFC9052}}.
 
 # Tokens
 
@@ -170,122 +170,159 @@ For example, `https://example.com` is a valid OI, but `https://EXAMPLE.COM` is n
 
 ## Token Encoding
 
-Tokens MUST be encoded as a JWS {{!RFC7515}}.
-Tokens encoded as JWS MUST only use JWS protected headers and MUST include either the `jwk` or the `kid` header parameter, which MUST identify the respective verification key.
-Any token MUST include the `cty` (content type) header parameter.
+Tokens MUST be encoded as CWTs {{!RFC8392}} secured by a COSE_Sign1 structure {{!RFC9052}}, and tokens MUST include the CWT CBOR tag 61 and the COSE_Sign1 CBOR tag 18.
+The COSE payload MUST be present and MUST contain the CBOR-encoded CWT Claims Set.
+External additional authenticated data MUST be the zero-length byte string.
 
-### Key Identifiers and Key Formats
+The CWT Claims Set MUST be a CBOR map.
+Registered CWT claims use their integer claim keys from {{!RFC8392}}; claims defined by this document use the text-string claim keys shown below.
+Unless this document states otherwise, the terms and processing rules of {{!RFC8392}} apply.
 
-Keys are encoded as JSON Web Keys (JWKs) {{!RFC7517}}.
-In context of ADEM, keys MUST include the `alg` parameter.
-We identify keys using their key identifier `kid`.
-Key identifiers are computed as per {{jwk-hashing}}.
-JWKs in context of ADEM MUST NOT contain the `kid` parameter, which forces implementations to compute and thus verify the value themselves.
-See {{jwk-hashing}} for an example.
+### Key Identifiers and Key Formats {#key-formats}
+
+Keys are encoded as COSE_Key structures {{!RFC9052}} and MUST include the `alg` parameter (label 3).
+The key's `alg` value MUST equal the `alg` value in the protected header of each token signed with that key.
+
+We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in {{!RFC9679}}.
+To force computation and thus verification if key identifiers, COSE_Key structures in the context of ADEM SHOULD NOT contain the `kid` parameter (label 2).
+Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter and MUST verify the `kid` parameter by recomputing it.
+
+Key identifiers are encoded as a CBOR byte string when used as the COSE `kid` header parameter or as a CWT claim value.
+When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
+
+### Common Token Fields {#common-token-fields}
+
+Both emblems and endorsements use the following protected header parameters and CWT claims.
+Implementations generating tokens MUST NOT include header parameters or CWT claims beyond those referenced in this document.
+
+The COSE protected header MUST include the `alg` (label 1) and `kid` (label 4) header parameters.
+The `alg` value identifies the signature algorithm.
+The `kid` value MUST equal the key identifier of the verification key as specified in {{key-formats}}.
+
+The protected header MAY include the `typ` (label 16, see {{!RFC9596}}) header parameter with the value `"application/adem"`.
+The `typ` parameter identifies tokens as emblems.
+Where clear from context, the `typ` parameter MAY be omitted.
+
+The COSE unprotected header MUST be empty.
+
+| Claim | Claim key | Status | Semantics | CBOR type |
+| ----- | --------- | ------ | --------- | --------- |
+| `ver` | `"ver"` | REQUIRED | Version counter | uint, value 1 |
+| `iat` | 6 | OPTIONAL | Issued-at time, as per {{!RFC8392}} | NumericDate |
+| `nbf` | 5 | REQUIRED | Not-before time, as per {{!RFC8392}} | NumericDate |
+| `exp` | 4 | REQUIRED | Expiration time, as per {{!RFC8392}} | NumericDate |
+| `iss` | 1 | RECOMMENDED | Organization issuing the token | tstr containing an OI |
+| `emb` | `"emb"` | REQUIRED | Emblem details or constraints, depending on the token type | map |
+
+The token version counter `ver` MUST be an unsigned integer in the range 0 to 255, encoded as a CBOR unsigned integer.
+This document specifies version 1.
+
+For an emblem, `iss` identifies the organization signaling protection; for an endorsement, it identifies the endorsing organization.
+The `emb` claim MUST be a CBOR {{!RFC8949}} map.
+Its entries and their requirements depend on the token type and are defined in {{emblems}} and {{endorsements}}.
 
 ### Emblems {#emblems}
 
-An emblem is encoded as a JWS and signals the protection of assets.
-It is distinguished by the `cty` header parameter value which MUST be `"adem-emb"`.
-Its payload includes the JWT claims defined in the table below, following {{!RFC7519}}, [Section 4.1](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1).
-All other registered JWT claims MUST NOT be included.
+An emblem is encoded as a signed CWT and signals the protection of assets.
+Its CWT Claims Set includes the common claims defined in {{common-token-fields}} and the additional claim defined in the table below.
 
-| Claim | Status | Semantics | Encoding |
-| ----- | ------ | --------- | -------- |
-| `ver` | REQUIRED | Version string | `"v1"` |
-| `iat` | REQUIRED | As per {{!RFC7519}} | |
-| `nbf` | REQUIRED | As per {{!RFC7519}} | |
-| `exp` | REQUIRED | As per {{!RFC7519}} | |
-| `iss` | RECOMMENDED | Organization signaling protection | OI |
-| `assets` | REQUIRED | AIs marked a protected | Array of AIs |
-| `emb` | REQUIRED | Emblem details | JSON object (as follows) |
+| Claim | Claim key | Status | Semantics | CBOR type |
+| ----- | --------- | ------ | --------- | --------- |
+| `assets` | `"assets"` | REQUIRED | AIs marked as protected | array of tstr AIs |
 
-Multiple AIs within `assets` may be desirable, e.g., to include both a asset's IPv4 and IPv6 address.
-The claim value of `emb` MUST be a JSON {{!RFC8259}} object with the following key-value mappings.
+Multiple AIs within `assets` may be desirable, e.g., to include both an asset's IPv4 and IPv6 address.
+For an emblem, the `emb` claim contains the following entries.
 
-| Claim | Status | Semantics | Encoding |
-| ----- | ------ | --------- | -------- |
-| `prp` | OPTIONAL | Emblem purposes | Array of `purpose` (as follows) |
-| `dst` | OPTIONAL | Permitted distribution channels | Array of `distribution-method` (as follows) |
+| Entry | Map key | Status | Semantics | CBOR type |
+| ----- | ------- | ------ | --------- | --------- |
+| `prp` | `"prp"` | REQUIRED | Emblem purposes | array of tstr `purpose` values (as follows) |
+| `dst` | `"dst"` | OPTIONAL | Permitted distribution channels | array of tstr `distribution-method` values (as follows) |
 
-      purpose = "protective" | "indicative"
+The `purpose` values identify the purpose signaled by the emblem.
 
-      distribution-method = "dns"
+| Value | Explanation |
+| ----- | ----------- |
+| `"redcr-protective"` | Protective use of the red cross, red crescent, or red crystal emblem to signal protection under IHL. |
+| `"redcr-indicative"` | Indicative use of the red cross, red crescent, or red crystal emblem to signal an affiliation with the International Red Cross and Red Crescent Movement. |
+| `"dangerous-forces"` | Identification of works and installations containing dangerous forces, such as dams, dykes, and nuclear electrical generating stations. |
+| `"civil-defense"` | Identification of civil defence organizations and their protected personnel and assets. |
+| `"blue-shield"` | Identification of cultural property protected under IHL. |
 
-<!-- TODO: Explain distribution methods -->
+The `distribution-method` values identify the permitted methods for distributing the emblem.
+
+| Value | Explanation |
+| ----- | ----------- |
+| `"dns"` | Distribution through the Domain Name System (DNS), as specified in other documents. |
+
+Other distribution methods are planned for the future.
 
 #### Example
 
-For example, an emblem might comprise the following header and payload.
+For example, an emblem might comprise the following protected header and CWT Claims Set, shown in CBOR diagnostic notation.
 
-Header:
+Protected header:
 
-~~~~json
+~~~~cbor-diag
 {
-  "alg": "ES512",
-  "jwk": { ... },
-  "cty": "adem-emb"
+  / alg / 1: -36, / ES512 /
+  / kid / 4: h'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+  / typ / 16: "application/adem"
 }
 ~~~~
 
-Payload:
+Claims Set:
 
-~~~~json
+~~~~cbor-diag
 {
-  "ver": "v1",
+  "ver": 1,
   "emb": {
     "dst": ["dns"],
-    "prp": ["protective"]
+    "prp": ["redcr-protective"]
   },
-  "iat": 1672916137,
-  "nbf": 1672916137,
-  "exp": 1675590932,
-  "iss": "https://example.com",
+  / nbf / 5: 1672916137,
+  / exp / 4: 1675590932,
+  / iss / 1: "https://example.com",
   "assets": ["[2001:0db8:582:ae33::29]"]
 }
 ~~~~
 
-### Endorsements
+### Endorsements {#endorsements}
 
-Endorsements are encoded as JWSs.
-Endorsements attest two statements: that a public key is affiliated with an organization, pointed to by OIs, and that this organization is eligible to issue emblems for their assets.
-They are distinguished by the `cty` header parameter value which MUST be `"adem-end"`.
-An endorsement's payload includes the JWT claims defined in the table below.
-Any other registered JWT claims MUST NOT be included.
+Endorsements are encoded as signed CWTs.
+Endorsements attest two statements: that a public key is affiliated with an organization, identified by an OI, and that this organization is authorized to issue emblems for their assets.
+An endorsement's CWT Claims Set includes the common claims defined in {{common-token-fields}} and the additional claims defined in the table below.
 
-| Claim | Status | Semantics | Encoding |
-| ----- | ------ | --------- | -------- |
-| `ver` | REQUIRED | Version string | `"v1"` |
-| `iat` | REQUIRED | As per {{!RFC7519}} | |
-| `nbf` | REQUIRED | As per {{!RFC7519}} | |
-| `exp` | REQUIRED | As per {{!RFC7519}} | |
-| `iss` | RECOMMENDED | Endorsing organization | OI |
-| `sub` | RECOMMENDED | Endorsed organization | OI |
-| `key` | REQUIRED | Endorsed organization's public key | Endorsed key by reference to its `kid`. |
-| `log` | OPTIONAL | Root key CT logs | Array (as follows) |
-| `end` | REQUIRED | Endorsed key can endorse further | Boolean |
-| `emb` | REQUIRED | Emblem constraints | JSON object (as follows) |
+| Claim | Claim key | Status | Semantics | CBOR type |
+| ----- | --------- | ------ | --------- | --------- |
+| `sub` | 2 | RECOMMENDED | Endorsed organization | tstr containing an OI |
+| `key` | `"key"` | REQUIRED | Endorsed organization's public key | bstr containing the endorsed key's `kid` |
+| `end` | `"end"` | REQUIRED | Endorsed key can endorse further | bool |
 
-If an endorsement was signed by a root key, it MUST include `log`.
-`log` maps to an array of JSON objects with the following claims.
-The semantics of these fields are defined in {{!RFC6962}} for `v1` and {{STATIC-CT}} for `static`.
+The protected header parameter `log` uses the text-string label `"log"` and identifies the CT logs that contain a binding certificate for the endorsement's verification key.
+If an endorsement was signed by a root key, its protected header MUST include `log`.
+The `log` value is an array of CBOR maps, each of which identifies a CT log entry that commits to the organization's root signing key (see {{pk-distribution}}).
+This standard supports log entries of both standard CT logs as specified in {{!RFC6962}} and tiled CT logs as specified in {{STATIC-CT}}.
 
-| Claim | Status | Semantics | Encoding |
-| ----- | ------ | --------- | -------- |
-| `ver` | REQUIRED | CT log version | `"v1"` or `"static"` |
-| `id`  | REQUIRED | The CT log's ID | Base64-encoded string |
-| `hash` | REQUIRED | The binding certificate's leaf hash in the log | Base64-encoded string |
+| Entry | Map key | Status | Semantics | CBOR type |
+| ----- | ------- | ------ | --------- | --------- |
+| `id`  | `"id"` | REQUIRED | The CT log's ID | bstr |
+| `hash` | `"hash"` | see below | The binding certificate's leaf hash in the log | bstr |
+| `index` | `"index"` | see below | The binding certificate's log entry index in the log | uint |
 
-`emb` resembles the emblem's `emb` claim and includes the following claims.
+For logs following {{!RFC6962}}, a map in `log` MUST include the `hash` entry and MUST NOT include the `index` entry.
+The contrary is the case for logs following {{STATIC-CT}}.
+For those logs, a map in `log` MUST include the `index` entry and MUST NOT include the `hash` entry.
 
-| Claim | Status | Semantics | Encoding |
-| ----- | ------ | --------- | -------- |
-| `prp` | OPTIONAL | Purpose constraint | Array of `purpose` |
-| `dst` | OPTIONAL | Distribution method constraint | Array of `distribution-method` |
-| `assets` | OPTIONAL | Asset constraint | Array of AIs |
-| `wnd` | OPTIONAL | Maximum emblem lifetime | Integer |
+For an endorsement, the `emb` claim contains the following constraint entries.
 
-We say that an endorsement *endorses* a token if its `key` claim equals the token's verification key, and its `sub` claim equals the token's `iss` claim.
+| Entry | Map key | Status | Semantics | CBOR type |
+| ----- | ------- | ------ | --------- | --------- |
+| `prp` | `"prp"` | OPTIONAL | Purpose constraint | array of tstr `purpose` values |
+| `dst` | `"dst"` | OPTIONAL | Distribution method constraint | array of tstr `distribution-method` values |
+| `assets` | `"assets"` | OPTIONAL | Asset constraint | array of tstr AIs |
+| `wnd` | `"wnd"` | OPTIONAL | Maximum emblem lifetime in seconds | int |
+
+We say that an endorsement *endorses* a token if its `key` claim equals the key identifier of the token's verification key, and its `sub` claim equals the token's `iss` claim.
 We note that the latter includes the possibility of both `sub` and `iss` being undefined.
 
 We say that an emblem is *valid* with respect to an endorsement if all the following conditions apply:
@@ -309,9 +346,9 @@ For a root public key to be configured correctly, there MUST be an X.509 certifi
   one of the logs accepted root certificates. Clients are RECOMMENDED to verify
   that this chain is valid and that none of the certificates along it have been
   revoked.
-* MUST be valid for at least all the following domains (`<OI>` is understood to be a placeholder for the party's OI):
+* MUST be valid for at least all the following domains (`<OI>` is understood to be a placeholder for the domain name in the party's OI):
   * `adem-configuration.<OI>`
-  * For root public key's kid `<KID>` (to be understood as a placeholder): `<KID>.adem-configuration.<OI>`
+  * For the textual representation `<KID>` of the root public key's key identifier, as specified in {{key-formats}}: `<KID>.adem-configuration.<OI>`
 
 We intentionally do not specify how clients should check a certificate's revocation status.
 It is RECOMMENDED that clients use offline revocation checks that are provided by major browser vendors, for example, [OneCRL or CRLite by Mozilla](https://wiki.mozilla.org/CA/Revocation_Checking_in_Firefox), or [CRLSet by Chrome](https://chromium.googlesource.com/playground/chromium-org-site/+/refs/heads/main/Home/chromium-security/crlsets.md).
@@ -330,26 +367,24 @@ The validity of an emblem is defined with respect to a public key.
 A validity checking algorithm MUST returns the following values.
 The order of these values encodes the *strength* of the verification result.
 
-1. `UNSIGNED`
-2. `INVALID`
-3. `SIGNED-UNTRUSTED`
-4. `SIGNED-TRUSTED`
-5. `ORGANIZATIONAL-UNTRUSTED`
-6. `ORGANIZATIONAL-TRUSTED`
-7. `ENDORSED-UNTRUSTED`
-8. `ENDORSED-TRUSTED`
+1. `INVALID`
+2. `SIGNED-UNTRUSTED`
+3. `SIGNED-TRUSTED`
+4. `ORGANIZATIONAL-UNTRUSTED`
+5. `ORGANIZATIONAL-TRUSTED`
+6. `ENDORSED-UNTRUSTED`
+7. `ENDORSED-TRUSTED`
 
 Given an input public key and an emblem with a set of endorsements, a verification algorithm takes the following steps:
 
-1. If the emblem does not bear a signature, return `UNSIGNED`.
-2. Run the *signed emblem verification procedure* ({{signed-emblems}}; results in one of `SIGNED-TRUSTED`, `SIGNED-UNTRUSTED`, or `INVALID`).
-3. If previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last verification procedure's result and the emtpy set of OIs.
-4. Run the *organizational emblem verification procedure* ({{org-emblems}}; results in one of `ORGANIZATIONAL-TRUSTED`, `ORGANIZATIONAL-UNTRUSTED`, `INVALID`).
-5. If the previous procedure resulted in `INVALID` return `INVALID` and the empty set of OIs.
-6. If all tokens include the same `iss` claim, return the strongest return value matching `*-TRUSTED`, the strongest return value matching `*-UNTRUSTED` provided that it is strictly stronger than the strongest return value matching `*-TRUSTED`, and the empty set of OIs.
-7. Run the *endorsed emblem verification procedure* ({{endorsed-emblems}}; results in a set of OIs and one of `ENDORSED-TRUSTED`, `ENDORSED-UNTRUSTED`, `INVALID`).
-8. If the previous procedure resulted in `INVALID` return `INVALID` and the empty set of OIs.
-9. Return the strongest return value matching `*-TRUSTED`, the strongest return value matching `*-UNTRUSTED` provided that it is strictly stronger than the strongest return value matching `*-TRUSTED`, and the set of OIs returned by the endorsed emblem verification procedure.
+1. Run the *signed emblem verification procedure* ({{signed-emblems}}; results in one of `SIGNED-TRUSTED`, `SIGNED-UNTRUSTED`, or `INVALID`).
+2. If previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last verification procedure's result and the emtpy set of OIs.
+3. Run the *organizational emblem verification procedure* ({{org-emblems}}; results in one of `ORGANIZATIONAL-TRUSTED`, `ORGANIZATIONAL-UNTRUSTED`, `INVALID`).
+4. If the previous procedure resulted in `INVALID` return `INVALID` and the empty set of OIs.
+5. If all tokens include the same `iss` claim, return the strongest return value matching `*-TRUSTED`, the strongest return value matching `*-UNTRUSTED` provided that it is strictly stronger than the strongest return value matching `*-TRUSTED`, and the empty set of OIs.
+6. Run the *endorsed emblem verification procedure* ({{endorsed-emblems}}; results in a set of OIs and one of `ENDORSED-TRUSTED`, `ENDORSED-UNTRUSTED`, `INVALID`).
+7. If the previous procedure resulted in `INVALID` return `INVALID` and the empty set of OIs.
+8. Return the strongest return value matching `*-TRUSTED`, the strongest return value matching `*-UNTRUSTED` provided that it is strictly stronger than the strongest return value matching `*-TRUSTED`, and the set of OIs returned by the endorsed emblem verification procedure.
 
 Note that the endorsed emblem verification procedure resulting in `INVALID` is handled implicitly in step 8.
 As the procedure did not terminate in step 5, organizational verification must have been successful.
@@ -376,20 +411,6 @@ Such an emblem signals that the respective asset is enjoys the specific protecti
 Emblem issuers MUST only issue emblems for assets that are used only for protected purposes.
 
 # Algorithms
-
-## JWK Hashing {#jwk-hashing}
-
-Context:
-
-* Input: A JWK public key as per {{!RFC7517}} in arbitrary encoding.
-* Output: A hash of the JWK
-
-Algorithm:
-
-1. Parse the JWK as JSON object.
-2. Drop the `kid` parameter from the JWK if present.
-3. Compute the key's thumbprint using SHA-256 as per {{!RFC7638}}.
-4. Return the digest in base32 encoding as per {{!RFC4648}} in all lower-case and with trailing `=` removed.
 
 ## Signed Emblem Verification Procedure {#signed-emblems}
 
@@ -484,7 +505,6 @@ This is ensured by computing it using SHA-256.
 
 # IANA Considerations
 
-This document has no IANA actions.
-
+TODO
 
 --- back
