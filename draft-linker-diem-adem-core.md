@@ -38,7 +38,7 @@ informative:
 
 In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
 This enables military units to identify assets as respected and protected under international humanitarian law.
-This draft specifies the format and trust architecture of a protective, digital emblem for network-connected infrastructure.
+This draft specifies the message format and authorization model of a protective, digital emblem for network-connected infrastructure.
 Such emblems mark assets as protected under IHL analogously to the physical emblems.
 
 --- middle
@@ -47,7 +47,7 @@ Such emblems mark assets as protected under IHL analogously to the physical embl
 
 International Humanitarian Law (IHL) mandates that military units must not attack medical facilities, such as hospitals.
 The emblems of the red cross, red crescent, and red crystal are used to mark physical infrastructure (e.g., by a red cross painted on a hospital's rooftop), thereby enabling military units to identify those assets as protected under IHL.
-This document specifies the structure and trust model of digital emblems for IHL that can be used to mark digital infrastructure as protected under IHL analogously to the physical emblems.
+This document specifies the message format and authorization model of digital emblems for IHL that can be used to mark digital infrastructure as protected under IHL analogously to the physical emblems.
 We call this system *ADEM*, which stands for an Authentic Digital EMblem.
 
 In ADEM, emblems are signed statements that mark *assets* as protected under IHL.
@@ -94,26 +94,17 @@ Beyond these terms, we use the terms "claim", "claim key", "claim value", and "C
 
 # Overview
 
-TODO
+This document defines ADEM's message format and authorization model.
+Emblems and endorsements are signed CWTs: an emblem marks assets for one or more emblem purposes, while an endorsement associates a signing key with an organization and authorizes specific purposes.
+Endorsements can form a chain within an organization, and authorities can endorse an organization's root key.
+Organizations commit to root keys through certificates recorded in Certificate Transparency (CT) logs.
 
-# Tokens
+In the following, we specify a public key format for use in ADEM, the format of emblems and endorsements as *tokens*, and the validation of sets of public keys and tokens.
+Separate documents will specify how tokens and public keys are discovered and transported, and how assets are identified.
 
-## Organization Identifiers
+# Key Identifiers and Key Formats {#key-formats}
 
-Emblems are issued for assets by emblem issuers, which in turn are authorized by authorities.
-Emblem issuers and authorities are identified by Uniform Resource Identifiers (URIs) {{!RFC3986}} of the following form, which we call *organization identifiers* (OIs).
-The scheme MUST be `https`.
-The authority component MUST containa fully qualified domain name (FQDN), which MUST be represented in all lower-case.
-The path, query, and fragment components MUST be empty, and the URI must there MUST NOT end with a trailing slash.
-Concretely, an OI has the syntax:
-
-~~~~
-organization-identifier = "https://" FQDN
-~~~~
-
-## Key Identifiers and Key Formats {#key-formats}
-
-Keys are encoded as COSE_Key structures {{!RFC9052}} and MUST include the `alg` parameter (label 3).
+Public keys are encoded as COSE_Key structures {{!RFC9052}} and MUST include the `alg` parameter (label 3).
 The key's `alg` value MUST equal the `alg` value in the protected header of each token signed with that key.
 
 We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in {{!RFC9679}}.
@@ -122,6 +113,21 @@ Implementations that encode key material MUST NOT include the `kid` parameter, b
 
 Key identifiers are encoded as a CBOR byte string when used as the COSE `kid` header parameter or as a CWT claim value.
 When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
+
+# Tokens
+
+## Organization Identifiers
+
+Emblems are issued for assets by emblem issuers, which in turn are authorized by authorities.
+Emblem issuers and authorities are identified by Uniform Resource Identifiers (URIs) {{!RFC3986}} of the following form, which we call *organization identifiers* (OIs).
+The scheme MUST be `https`.
+The authority component MUST contain a fully qualified domain name (FQDN), which MUST be represented in all lower-case.
+The path, query, and fragment components MUST be empty, and the URI MUST NOT end with a trailing slash.
+Concretely, an OI has the syntax:
+
+~~~~
+organization-identifier = "https://" FQDN
+~~~~
 
 ## Token Encoding
 
@@ -182,6 +188,10 @@ An emblem's CWT Claims Set includes the common claims defined in {{common-token-
 | ----- | --------- | ------ | --------- | --------- |
 | `assets` | `"assets"` | REQUIRED | Assets marked as protected | array |
 
+The `assets` claim contains asset identifiers.
+Their syntax, encoding, and matching semantics will be defined in separate drafts that specify distribution methods for ADEM tokens.
+The asset identifier in the example below is illustrative.
+
 An emblem's `prp` claim specifies how the asset is marked.
 For example, when the claim has value 1, it indicates that the asset is marked with the digital equivalent to the emblems of the Red Cross, Red Crescent, and Red Crystal.
 
@@ -207,7 +217,7 @@ Claims Set:
   / nbf / 5: 1672916137,
   / exp / 4: 1675590932,
   / iss / 1: "https://example.com",
-  "assets": ["[2001:0db8:582:ae33::29]"],
+  "assets": ["example.com"],
   "prp": 1
 }
 ~~~~
@@ -249,8 +259,7 @@ For logs implementing {{STATIC-CT}}, a map in `log` MUST include the `index` ent
 # Public Key Commitment {#pk-distribution}
 
 Parties must undeniably link their root public keys to their OI.
-In this section, we specify the configuration of an emblem issuer's OI.
-Root public keys are all public keys which are only endorsed by third parties and never endorsed by the organization itself.
+In this section, we specify how emblem issuers and authorities commit to certain, root public keys.
 A party MAY have multiple root public keys.
 For a root public key to be configured correctly, there MUST be an X.509 certificate that:
 
@@ -272,13 +281,13 @@ It is RECOMMENDED that clients use offline revocation checks that are provided b
 # Validation
 
 Whenever a validator receives a set of tokens, they SHOULD validate it.
-Validation returns one or more the following values and a set of OIs.
+Validation returns one or more of the following values and a set of OIs.
 The set of OIs returned by the validation procedure encodes the OIs of endorsing parties for which validation passed.
 
 1. `INVALID`
 2. `SIGNED`
-4. `ORGANIZATIONAL`
-6. `ENDORSED`
+3. `ORGANIZATIONAL`
+4. `ENDORSED`
 
 Given a set of tokens and a set of public keys, validation takes the following steps.
 
@@ -289,17 +298,20 @@ Given a set of tokens and a set of public keys, validation takes the following s
     3. Should either of the aforementioned validation steps fail, discard this token.
 3. Identify the emblem among the remaining tokens.
 The emblem is the token containing an `assets` claim, and it MUST be uniquely defined.
-If there is more than one token containing an `assets` claim, return `INVALID`.
+If there is not exactly one token containing an `assets` claim, return `INVALID`.
 All other tokens are endorsements.
-4. Run the *signed emblem validation procedure* ({{signed-emblems}}; results in one of `SIGNED`, or `INVALID`).
-5. If previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last validation procedure's result and the empty set of OIs.
+4. Run the *signed emblem validation procedure* ({{signed-emblems}}; results in one of `SIGNED` or `INVALID`).
+5. If the previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last validation procedure's result and the empty set of OIs.
 6. Run the *organizational emblem validation procedure* ({{org-emblems}}; results in one of `ORGANIZATIONAL`, `INVALID`).
-7. If the previous procedure resulted in `INVALID` return `INVALID` and the empty set of OIs.
+7. If the previous procedure resulted in `INVALID`, return `INVALID` and the empty set of OIs.
 8. Run the *endorsed emblem validation procedure* ({{endorsed-emblems}}; results in a set of OIs and one of `ENDORSED`, `INVALID`).
-9. If the endorsed emblem validation procedure resulted in `INVALID` return `SIGNED`, `ORGANIZATIONAL` and the empty set of OIs.
+9. If the endorsed emblem validation procedure resulted in `INVALID`, return `SIGNED`, `ORGANIZATIONAL` and the empty set of OIs.
 Otherwise, return `SIGNED`, `ORGANIZATIONAL`, `ENDORSED`, and the OIs returned by the endorsed emblem validation procedure.
 
 # Algorithms
+
+Each procedure operates on its own copy of the validated token set.
+Discarding endorsements within a procedure does not remove them from the inputs to subsequent procedures.
 
 ## Signed Emblem Validation Procedure {#signed-emblems}
 
@@ -313,7 +325,8 @@ Algorithm:
 
 1. Discard all endorsements including an `iss` claim different to the emblem's `iss` claim.
 An omitted `iss` claim is different to an included `iss` claim and equal to an omitted `iss` claim.
-2. Verify that all endorsements form a consecutive chain where there is a unique root endorsement and the public key which was used to verify the emblem's signature is transitively endorsed by that root endorsement.
+2. If no endorsements remain, return `SIGNED`.
+Otherwise, verify that all endorsements form a consecutive chain where there is a unique root endorsement and the public key which was used to verify the emblem's signature is transitively endorsed by that root endorsement.
 3. Verify that all endorsements bear the claim `end=true` except for the endorsement endorsing the emblem's verification key, the `end` claim of which MAY be `false`.
 4. Verify that the emblem is valid with regard to every endorsement.
 5. If any of the aforementioned validation steps fail, return `INVALID`.
@@ -325,7 +338,7 @@ Context:
 
 * Assumptions: All input tokens' signatures, and `nbf` and `exp` claims were validated.
 Signed emblem validation has been performed and did not return `INVALID`.
-Every token as part of the input includes the `iss` claim.
+The emblem includes the `iss` claim.
 * Input: An emblem and a set of endorsements.
 * Output: `ORGANIZATIONAL` or `INVALID`.
 
@@ -353,16 +366,16 @@ Algorithm:
     1. Verify that it endorses the top-most endorsement with the same `iss` claim as the emblem.
     2. Verify that it bears the claim `end=true`.
     3. Verify that the emblem is valid with regard to this endorsement.
-    4. Verify the endorsement's verification public key by using its `iss` and `log` header parameter as specified in {{pk-distribution}}.
+    4. Verify the endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-distribution}}.
     5. Should any of the aforementioned validation steps fail, discard this endorsement.
 3. If there are no endorsements remaining, return `INVALID` and the empty set of OIs.
 Otherwise, return `ENDORSED` and the set of all `iss` claims of the remaining endorsements.
 
 # Security Considerations
 
-### Interpreting Validation Results
+## Interpreting Validation Results
 
-We strongly RECOMMEND against accepting emblems resulting in `SIGNED`.
+Validators SHOULD NOT accept emblems resulting only in `SIGNED` without authenticating their verification keys out of band.
 In such cases, validators should aim to authenticate the respective public keys via other, out-of-band methods.
 Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public keys, but might not be able to set up a signing infrastructure linking their assets to a root key.
 
