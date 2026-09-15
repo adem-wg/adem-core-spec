@@ -1,0 +1,710 @@
+
+
+
+
+Digital Emblems                                                F. Linker
+Internet-Draft                                         15 September 2026
+Intended status: Informational                                          
+Expires: 19 March 2027
+
+
+             ADEM - Message Format and Authorization Model
+                   draft-linker-diem-adem-core-latest
+
+Abstract
+
+   In times of armed conflict, the protective emblems of the red cross,
+   red crescent, and red crystal are used to mark physical assets.  This
+   enables military units to identify assets as respected and protected
+   under international humanitarian law.  This draft specifies the
+   message format and authorization model of a protective, digital
+   emblem for network-connected infrastructure.  Such emblems mark
+   assets as protected under IHL analogously to the physical emblems.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://adem-
+   wg.github.io/adem-core-spec/draft-linker-diem-adem-core.html.  Status
+   information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-linker-diem-adem-core/.
+
+   Discussion of this document takes place on the Digital Emblems
+   Working Group mailing list (mailto:diem@ietf.org), which is archived
+   at https://mailarchive.ietf.org/arch/browse/diem.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/diem/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/adem-wg/adem-core-spec.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 19 March 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Overview
+   4.  Key Identifiers and Key Formats
+   5.  Tokens
+     5.1.  Organization Identifiers
+     5.2.  Token Encoding
+       5.2.1.  Common Token Fields
+       5.2.2.  Emblems
+       5.2.3.  Endorsements
+   6.  Public Key Commitment
+   7.  Validation
+   8.  Algorithms
+     8.1.  Signed Emblem Validation Procedure
+     8.2.  Organizational Emblem Validation Procedure
+     8.3.  Endorsed Emblem Validation Procedure
+   9.  Security Considerations
+     9.1.  Interpreting Validation Results
+     9.2.  No Endorsements without iss
+   10. IANA Considerations
+   11. Normative References
+   Author's Address
+
+1.  Introduction
+
+   International Humanitarian Law (IHL) mandates that military units
+   must not attack medical facilities, such as hospitals.  The emblems
+   of the red cross, red crescent, and red crystal are used to mark
+   physical infrastructure (e.g., by a red cross painted on a hospital's
+   rooftop), thereby enabling military units to identify those assets as
+   protected under IHL.  This document specifies the message format and
+   authorization model of digital emblems for IHL that can be used to
+   mark digital infrastructure as protected under IHL analogously to the
+   physical emblems.  We call this system _ADEM_, which stands for an
+   Authentic Digital EMblem.
+
+   In ADEM, emblems are signed statements that mark _assets_ as
+   protected under IHL.  Emblems are issued by _emblem issuers_. Emblem
+   issuers can be authorized by _authorities_. Authorities do so by
+   signing _endorsements_ for emblem issuers.  We call both emblems and
+   endorsements _tokens_. Emblems are consumed and validated by
+   _validators_.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   *Asset*  An asset is a network-connected service that enjoys the
+      specific protections under IHL.
+
+   *Emblem*  An emblem signals that an asset enjoys specific protections
+      under IHL.
+
+   *Emblem issuer*  An emblem issuer is an organization entitled to
+      issue claims of protection for their digital infrastructure.
+
+   *Endorsement*  An endorsement associates a public key with an
+      identity, and hence, resembles the idea of a certificate.  When
+      signed by an authority, it attests that the authorized issuer can
+      generally issue claims of protection.
+
+   *Authority*  An authority is an organization that attests to a
+      party's status as being eligible to issue emblems under IHL.
+
+   *Token*  A token is either an emblem or an endorsement and is encoded
+      as a signed CBOR Web Token (CWT).
+
+   *Organization*  An emblem issuer or authority.
+
+   *Root Key*  Organizations control root keys, which identify them
+      cryptographically.  Any key that an organization commits to as
+      described in Section 6 is a root key.
+
+   *Validator*  A validator is an agent interested in observing and
+      verifying digital emblems.
+
+   Beyond these terms, we use the terms "claim", "claim key", "claim
+   value", and "CWT Claims Set" as defined in [RFC8392], and "header
+   parameter" as defined in [RFC9052].
+
+3.  Overview
+
+   This document defines ADEM's message format and authorization model.
+   Emblems and endorsements are signed CWTs: an emblem marks assets for
+   one or more emblem purposes, while an endorsement associates a
+   signing key with an organization and authorizes specific purposes.
+   Endorsements can form a chain within an organization, and authorities
+   can endorse an organization's root key.  Organizations commit to root
+   keys through certificates recorded in Certificate Transparency (CT)
+   logs.
+
+   In the following, we specify a public key format for use in ADEM, the
+   format of emblems and endorsements as _tokens_, and the validation of
+   sets of public keys and tokens.  Separate documents will specify how
+   tokens and public keys are discovered and transported, and how assets
+   are identified.
+
+4.  Key Identifiers and Key Formats
+
+   Public keys are encoded as COSE_Key structures [RFC9052] and MUST
+   include the alg parameter (label 3).  The key's alg value MUST equal
+   the alg value in the protected header of each token signed with that
+   key.
+
+   We identify keys using key identifiers, which are 32-byte SHA-256
+   COSE Key Thumbprints, computed as specified in [RFC9679].  To force
+   computation and thus verification of key identifiers, COSE_Key
+   structures in the context of ADEM SHOULD NOT contain the kid
+   parameter (label 2).  Implementations that encode key material MUST
+   NOT include the kid parameter, but implementations consuming key
+   material SHOULD accept and ignore the kid parameter.
+
+   Key identifiers are encoded as a CBOR byte string when used as the
+   COSE kid header parameter or as a CWT claim value.  When a textual
+   representation is required, key identifiers are encoded using base32
+   as specified in [RFC4648], in lowercase and without trailing =
+   characters.
+
+5.  Tokens
+
+5.1.  Organization Identifiers
+
+   Emblems are issued for assets by emblem issuers, which in turn are
+   authorized by authorities.  Emblem issuers and authorities are
+   identified by Uniform Resource Identifiers (URIs) [RFC3986] of the
+   following form, which we call _organization identifiers_ (OIs).  The
+   scheme MUST be https.  The authority component MUST contain a fully
+   qualified domain name (FQDN), which MUST be represented in all lower-
+   case.  The path, query, and fragment components MUST be empty, and
+   the URI MUST NOT end with a trailing slash.  Concretely, an OI has
+   the syntax:
+
+   organization-identifier = "https://" FQDN
+
+5.2.  Token Encoding
+
+   Tokens MUST be encoded as CWTs [RFC8392] secured by a COSE_Sign1
+   structure [RFC9052], and tokens MUST include the CWT CBOR tag 61 and
+   the COSE_Sign1 CBOR tag 18.  The COSE payload MUST be present and
+   MUST contain the CBOR-encoded CWT Claims Set. External additional
+   authenticated data MUST be the zero-length byte string.
+
+   The CWT Claims Set MUST be a CBOR map.  Registered CWT claims use
+   their integer claim keys from [RFC8392]; claims defined by this
+   document use the text-string claim keys shown below.
+
+5.2.1.  Common Token Fields
+
+   Both emblems and endorsements use the following protected header
+   parameters and CWT claims.  Implementations generating tokens MUST
+   NOT include header parameters or CWT claims beyond those referenced
+   in this document.
+
+   The COSE protected header MUST include the alg (label 1) and kid
+   (label 4) header parameters.  The alg value identifies the signature
+   algorithm.  The kid value MUST equal the key identifier of the
+   verification key as specified in Section 4.
+
+   The protected header MAY include the typ (label 16, see [RFC9596])
+   header parameter with the value "application/adem".  Where clear from
+   context, the typ parameter MAY be omitted.
+
+   The COSE unprotected header MUST be empty.
+
+   +=======+=======+=============+===================+=================+
+   | Claim | Claim | Status      | Semantics         | CBOR type       |
+   |       | key   |             |                   |                 |
+   +=======+=======+=============+===================+=================+
+   | ver   | "ver" | REQUIRED    | Version counter   | uint, value     |
+   |       |       |             |                   | 1               |
+   +-------+-------+-------------+-------------------+-----------------+
+   | iat   | 6     | OPTIONAL    | Issued-at time,   | NumericDate     |
+   |       |       |             | as per [RFC8392]  |                 |
+   +-------+-------+-------------+-------------------+-----------------+
+   | nbf   | 5     | REQUIRED    | Not-before time,  | NumericDate     |
+   |       |       |             | as per [RFC8392]  |                 |
+   +-------+-------+-------------+-------------------+-----------------+
+   | exp   | 4     | REQUIRED    | Expiration time,  | NumericDate     |
+   |       |       |             | as per [RFC8392]  |                 |
+   +-------+-------+-------------+-------------------+-----------------+
+   | iss   | 1     | RECOMMENDED | Organization      | tstr            |
+   |       |       |             | issuing the token | containing      |
+   |       |       |             |                   | an OI           |
+   +-------+-------+-------------+-------------------+-----------------+
+   | prp   | "prp" | REQUIRED    | Emblem purposes   | uint            |
+   +-------+-------+-------------+-------------------+-----------------+
+
+                                  Table 1
+
+   The token version counter ver MUST be an unsigned integer in the
+   range 0 to 255, encoded as a CBOR unsigned integer.  This document
+   specifies version 1.
+
+   For an emblem, iss identifies the organization signaling protection;
+   for an endorsement, it identifies the endorsing organization.
+
+   The prp claim identifies the kind of emblem recognized under IHL as a
+   bitmap and MUST be non-zero.  Each bit, as indicated below,
+   corresponds to a particular use of emblems recognized under IHL.
+   Values MAY be combined, using bit-wise OR, to indicate the use of
+   multiple emblems at the same time.  Consequently, the value of the
+   prp field MUST be between 1 and 31.  The semantics of the prp claim
+   differ between emblems and endorsements and will be specified later.
+
+       +==============+===========================================+
+       | Value        | Explanation                               |
+       +==============+===========================================+
+       | 0b_0000_0001 | Protective use of the red cross, red      |
+       |              | crescent, or red crystal emblem to signal |
+       |              | protection under IHL.                     |
+       +--------------+-------------------------------------------+
+       | 0b_0000_0010 | Indicative use of the red cross, red      |
+       |              | crescent, or red crystal emblem to signal |
+       |              | an affiliation with the International Red |
+       |              | Cross and Red Crescent Movement.          |
+       +--------------+-------------------------------------------+
+       | 0b_0000_0100 | Identification of works and installations |
+       |              | containing dangerous forces, such as      |
+       |              | dams, dykes, and nuclear electrical       |
+       |              | generating stations.                      |
+       +--------------+-------------------------------------------+
+       | 0b_0000_1000 | Identification of civil defence           |
+       |              | organizations and their protected         |
+       |              | personnel and assets.                     |
+       +--------------+-------------------------------------------+
+       | 0b_0001_0000 | Identification of cultural property       |
+       |              | protected under IHL.                      |
+       +--------------+-------------------------------------------+
+
+                                 Table 2
+
+5.2.2.  Emblems
+
+   An emblem's CWT Claims Set includes the common claims defined in
+   Section 5.2.1 and the additional claim defined in the table below.
+
+       +========+===========+==========+===============+===========+
+       | Claim  | Claim key | Status   | Semantics     | CBOR type |
+       +========+===========+==========+===============+===========+
+       | assets | "assets"  | REQUIRED | Assets marked | array     |
+       |        |           |          | as protected  |           |
+       +--------+-----------+----------+---------------+-----------+
+
+                                  Table 3
+
+   The assets claim contains asset identifiers.  Their syntax, encoding,
+   and matching semantics will be defined in separate drafts that
+   specify distribution methods for ADEM tokens.  The asset identifier
+   in the example below is illustrative.
+
+   An emblem's prp claim specifies how the asset is marked.  For
+   example, when the claim has value 1, it indicates that the asset is
+   marked with the digital equivalent to the emblems of the Red Cross,
+   Red Crescent, and Red Crystal.
+
+5.2.2.1.  Example
+
+   For example, an emblem might comprise the following protected header
+   and CWT Claims Set, shown in CBOR diagnostic notation.
+
+   Protected header:
+
+   {
+     / alg / 1: -36, / ES512 /
+     / kid / 4: h'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+     / typ / 16: "application/adem"
+   }
+
+   Claims Set:
+
+   {
+     "ver": 1,
+     / nbf / 5: 1672916137,
+     / exp / 4: 1675590932,
+     / iss / 1: "https://example.com",
+     "assets": ["example.com"],
+     "prp": 1
+   }
+
+5.2.3.  Endorsements
+
+   Endorsements are encoded as signed CWTs.  Endorsements attest two
+   statements: that a public key is affiliated with an organization,
+   identified by an OI, and that this organization is authorized to
+   issue emblems for their assets.  An endorsement's CWT Claims Set
+   includes the common claims defined in Section 5.2.1 and the
+   additional claims defined in the table below.
+
+   +=======+===========+=============+=========================+======+
+   | Claim | Claim key | Status      | Semantics               | CBOR |
+   |       |           |             |                         | type |
+   +=======+===========+=============+=========================+======+
+   | sub   | 2         | RECOMMENDED | Endorsed organization,  | tstr |
+   |       |           |             | identified by their OI  |      |
+   +-------+-----------+-------------+-------------------------+------+
+   | key   | "key"     | REQUIRED    | Endorsed organization's | bstr |
+   |       |           |             | public key thumbprint   |      |
+   +-------+-----------+-------------+-------------------------+------+
+   | end   | "end"     | REQUIRED    | Endorsed key can        | bool |
+   |       |           |             | endorse further         |      |
+   +-------+-----------+-------------+-------------------------+------+
+
+                                 Table 4
+
+   An endorsement's prp claim constrains what kind of emblems the
+   endorsed organization may issue.  Each bit set in the prp claim gives
+   the endorsed organization permission to issue the respective emblem.
+   An emblem is thus _valid_ with respect to an endorsement if the bit-
+   wise AND of the endorsement's prp claim and the emblem's prp claim is
+   equal to the emblem's prp claim.
+
+   We say that an endorsement _endorses_ a token if its key claim equals
+   the key identifier of the token's verification key, and its sub claim
+   equals the token's iss claim.  We note that the latter includes the
+   possibility of both sub and iss being undefined.
+
+   Endorsements MAY contain the log parameter in the protected header.
+   If an endorsement was signed by a root key, its protected header MUST
+   include log.  The log parameter uses the text-string label "log" and
+   identifies the CT logs that contain a binding certificate for the
+   endorsement's verification key.  The value of log is an array of CBOR
+   maps, each of which identifies a CT log entry that commits to the
+   organization's root signing key (see Section 6).  This standard
+   supports log entries of both standard CT logs as specified in
+   [RFC6962] and tiled CT logs as specified in [STATIC-CT].
+
+    +=======+=========+==========+============================+======+
+    | Entry | Map key | Status   | Semantics                  | CBOR |
+    |       |         |          |                            | type |
+    +=======+=========+==========+============================+======+
+    | id    | "id"    | REQUIRED | The CT log's ID            | bstr |
+    +-------+---------+----------+----------------------------+------+
+    | hash  | "hash"  | see      | The binding certificate's  | bstr |
+    |       |         | below    | leaf hash in the log       |      |
+    +-------+---------+----------+----------------------------+------+
+    | index | "index" | see      | The binding certificate's  | uint |
+    |       |         | below    | log entry index in the log |      |
+    +-------+---------+----------+----------------------------+------+
+
+                                 Table 5
+
+   For logs implementing [RFC6962], a map in log MUST include the hash
+   entry and MUST NOT include the index entry.  For logs implementing
+   [STATIC-CT], a map in log MUST include the index entry and MUST NOT
+   include the hash entry.
+
+6.  Public Key Commitment
+
+   Parties must undeniably link their root public keys to their OI.  In
+   this section, we specify how emblem issuers and authorities commit to
+   certain, root public keys.  A party MAY have multiple root public
+   keys.  For a root public key to be configured correctly, there MUST
+   be an X.509 certificate that:
+
+   *  MUST NOT be revoked
+
+   *  MUST be logged in the Certificate Transparency logs [RFC6962],
+      [STATIC-CT]
+
+      -  Note that log inclusion requires a valid certificate chain that
+         leads to one of the log's accepted root certificates.  Clients
+         are RECOMMENDED to verify that this chain is valid and that
+         none of the certificates along it have been revoked.
+
+   *  MUST be valid for at least all the following domains while not
+      considering wildcards in the certificate subject (<OI> is
+      understood to be a placeholder for the domain name in the party's
+      OI):
+
+      -  adem-configuration.<OI>
+
+      -  For the textual representation <KID> of the root public key's
+         key identifier, as specified in Section 4: <KID>.adem-
+         configuration.<OI>
+
+   We intentionally do not specify how clients should check a
+   certificate's revocation status.  It is RECOMMENDED that clients use
+   offline revocation checks that are provided by major browser vendors,
+   for example, OneCRL or CRLite by Mozilla
+   (https://wiki.mozilla.org/CA/Revocation_Checking_in_Firefox), or
+   CRLSet by Chrome (https://chromium.googlesource.com/playground/
+   chromium-org-site/+/refs/heads/main/Home/chromium-security/
+   crlsets.md).
+
+7.  Validation
+
+   Whenever a validator receives a set of tokens, they SHOULD validate
+   it.  Validation returns one or more of the following values and a set
+   of OIs.  The set of OIs returned by the validation procedure encodes
+   the OIs of endorsing parties for which validation passed.
+
+   1.  INVALID
+
+   2.  SIGNED
+
+   3.  ORGANIZATIONAL
+
+   4.  ENDORSED
+
+   Given a set of tokens and a set of public keys, validation takes the
+   following steps.
+
+   1.  For every public key, compute its key identifier as described in
+       Section 4.
+
+   2.  For every token, perform the following steps:
+
+       1.  Verify the token's signature using the public key whose key
+           identifier computed in the previous step matches the kid
+           header parameter.
+
+       2.  Verify the token's nbf and exp claims.
+
+       3.  Should either of the aforementioned validation steps fail,
+           discard this token.
+
+   3.  Identify the emblem among the remaining tokens.  The emblem is
+       the token containing an assets claim, and it MUST be uniquely
+       defined.  If there is not exactly one token containing an assets
+       claim, return INVALID.  All other tokens are endorsements.
+
+   4.  Run the _signed emblem validation procedure_ (Section 8.1;
+       results in one of SIGNED or INVALID).
+
+   5.  If the previous procedure resulted in INVALID or the emblem does
+       not include the iss claim, return the last validation procedure's
+       result and the empty set of OIs.
+
+   6.  Run the _organizational emblem validation procedure_
+       (Section 8.2; results in one of ORGANIZATIONAL, INVALID).
+
+   7.  If the previous procedure resulted in INVALID, return INVALID and
+       the empty set of OIs.
+
+   8.  Run the _endorsed emblem validation procedure_ (Section 8.3;
+       results in a set of OIs and one of ENDORSED, INVALID).
+
+   9.  If the endorsed emblem validation procedure resulted in INVALID,
+       return SIGNED, ORGANIZATIONAL and the empty set of OIs.
+       Otherwise, return SIGNED, ORGANIZATIONAL, ENDORSED, and the OIs
+       returned by the endorsed emblem validation procedure.
+
+8.  Algorithms
+
+   Each procedure operates on its own copy of the validated token set.
+   Discarding endorsements within a procedure does not remove them from
+   the inputs to subsequent procedures.
+
+8.1.  Signed Emblem Validation Procedure
+
+   Context:
+
+   *  Assumptions: All input tokens' signatures, and nbf and exp claims
+      were validated.
+
+   *  Input: An emblem and a set of endorsements.
+
+   *  Output: SIGNED or INVALID.
+
+   Algorithm:
+
+   1.  Discard all endorsements including an iss claim different to the
+       emblem's iss claim.  An omitted iss claim is different to an
+       included iss claim and equal to an omitted iss claim.
+
+   2.  If no endorsements remain, return SIGNED.  Otherwise, verify that
+       all endorsements form a consecutive chain where there is a unique
+       root endorsement and the public key which was used to verify the
+       emblem's signature is transitively endorsed by that root
+       endorsement.
+
+   3.  Verify that all endorsements bear the claim end=true except for
+       the endorsement endorsing the emblem's verification key, the end
+       claim of which MAY be false.
+
+   4.  Verify that the emblem is valid with regard to every endorsement.
+
+   5.  If any of the aforementioned validation steps fail, return
+       INVALID.  Otherwise, return SIGNED.
+
+8.2.  Organizational Emblem Validation Procedure
+
+   Context:
+
+   *  Assumptions: All input tokens' signatures, and nbf and exp claims
+      were validated.  Signed emblem validation has been performed and
+      did not return INVALID.  The emblem includes the iss claim.
+
+   *  Input: An emblem and a set of endorsements.
+
+   *  Output: ORGANIZATIONAL or INVALID.
+
+   Algorithm:
+
+   1.  Discard all endorsements including an iss claim different to the
+       emblem's iss claim.
+
+   2.  If either (a) no endorsements remain, or (b) the remaining
+       endorsements do not form a linear chain, or (c) the top-most
+       endorsement of that chain has no log protected header parameter,
+       return INVALID.
+
+   3.  Verify the top-most endorsement's verification public key by
+       using its iss claim and log header parameter as specified in
+       Section 6.  If verification fails, return INVALID.  Otherwise,
+       return ORGANIZATIONAL.
+
+8.3.  Endorsed Emblem Validation Procedure
+
+   Context:
+
+   *  Assumptions: All input tokens' signatures, and nbf and exp claims
+      were validated.  Organizational emblem validation has been
+      performed and did not return INVALID.
+
+   *  Input: An emblem and a set of endorsements.
+
+   *  Output: ENDORSED or INVALID, and a set of OIs.
+
+   Algorithm:
+
+   1.  Discard all endorsements with an iss claim equal to the emblem's
+       iss claim or with an undefined iss claim.
+
+   2.  For every endorsement:
+
+       1.  Verify that it endorses the top-most endorsement with the
+           same iss claim as the emblem.
+
+       2.  Verify that it bears the claim end=true.
+
+       3.  Verify that the emblem is valid with regard to this
+           endorsement.
+
+       4.  Verify the endorsement's verification public key by using its
+           iss claim and log header parameter as specified in Section 6.
+
+       5.  Should any of the aforementioned validation steps fail,
+           discard this endorsement.
+
+   3.  If there are no endorsements remaining, return INVALID and the
+       empty set of OIs.  Otherwise, return ENDORSED and the set of all
+       iss claims of the remaining endorsements.
+
+9.  Security Considerations
+
+9.1.  Interpreting Validation Results
+
+   Validators SHOULD NOT accept emblems resulting only in SIGNED without
+   authenticating their verification keys out of band.  In such cases,
+   validators should aim to authenticate the respective public keys via
+   other, out-of-band methods.  Signed emblems are supported for cases
+   of emergency where an emblem issuer is able to communicate one or
+   more public keys, but might not be able to set up a signing
+   infrastructure linking their assets to a root key.
+
+9.2.  No Endorsements without iss
+
+   The procedures to verify organizational or endorsed emblems as
+   specified in Section 8.2 and Section 8.3 assume that the emblem's iss
+   claim is defined.  Practically speaking, this implies that parties
+   can only go beyond pure public key authentication (where public keys
+   need to be authenticated out-of-band) by stating an OI.
+
+   The constraints on well-configured OIs offer two beneficial security
+   properties:
+
+   *  Parties cannot equivocate their keys, i.e., they need to commit to
+      a consistent set of keys.
+
+   *  Parties cannot deny having used certain root public keys.
+
+   These properties stem from parties needing to include a hash of their
+   key in a TLS certificate, and consequently, in certificate
+   transparency logs.
+
+10.  IANA Considerations
+
+   TODO
+
+11.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+              <https://www.rfc-editor.org/rfc/rfc4648>.
+
+   [RFC6962]  Laurie, B., Langley, A., and E. Kasper, "Certificate
+              Transparency", RFC 6962, DOI 10.17487/RFC6962, June 2013,
+              <https://www.rfc-editor.org/rfc/rfc6962>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8392]  Jones, M., Wahlstroem, E., Erdtman, S., and H. Tschofenig,
+              "CBOR Web Token (CWT)", RFC 8392, DOI 10.17487/RFC8392,
+              May 2018, <https://www.rfc-editor.org/rfc/rfc8392>.
+
+   [RFC9052]  Schaad, J., "CBOR Object Signing and Encryption (COSE):
+              Structures and Process", STD 96, RFC 9052,
+              DOI 10.17487/RFC9052, August 2022,
+              <https://www.rfc-editor.org/rfc/rfc9052>.
+
+   [RFC9596]  Jones, M.B. and O. Steele, "CBOR Object Signing and
+              Encryption (COSE) "typ" (type) Header Parameter",
+              RFC 9596, DOI 10.17487/RFC9596, June 2024,
+              <https://www.rfc-editor.org/rfc/rfc9596>.
+
+   [RFC9679]  Isobe, K., Tschofenig, H., and O. Steele, "CBOR Object
+              Signing and Encryption (COSE) Key Thumbprint", RFC 9679,
+              DOI 10.17487/RFC9679, December 2024,
+              <https://www.rfc-editor.org/rfc/rfc9679>.
+
+   [STATIC-CT]
+              "The Static Certificate Transparency API", 20 March 2026,
+              <https://github.com/C2SP/C2SP/
+              blob/0f3fddde7d1d8bd55e42723572c4c144457c50d0/static-ct-
+              api.md>.
+
+Author's Address
+
+   Felix Linker
+   Email: linkerfelix@gmail.com
