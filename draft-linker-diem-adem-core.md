@@ -1,5 +1,5 @@
 ---
-title: "ADEM - Message Format and Authorization Model"
+title: "An Authentic Digital, Distinctive EMblem (ADEM) - Message Format and Authorization Model"
 category: info
 
 docname: draft-linker-diem-adem-core-latest
@@ -36,26 +36,22 @@ informative:
 
 --- abstract
 
-In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
-This enables military units to identify assets as respected and protected under international humanitarian law.
-This draft specifies the message format and authorization model of a protective, digital emblem for network-connected infrastructure.
-Such emblems mark assets as protected under IHL analogously to the physical emblems.
+In times of armed conflict, the emblems recognized under International Humanitarian Law (IHL), such as the red cross, red crescent, and red crystal, are used to mark physical assets.
+This enables, e.g., the military to identify assets that enjoy the specific protections under IHL during their operations.
+This draft specifies the message format and authorization model for a digital emblem, which signals that network-connected services enjoy specific protections under IHL.
 
 --- middle
 
 # Introduction
 
-International Humanitarian Law (IHL) mandates that military units must not attack medical facilities, such as hospitals.
-The emblems of the red cross, red crescent, and red crystal are used to mark physical infrastructure (e.g., by a red cross painted on a hospital's rooftop), thereby enabling military units to identify those assets as protected under IHL.
-This document specifies the message format and authorization model of digital emblems for IHL that can be used to mark digital infrastructure as protected under IHL analogously to the physical emblems.
-We call this system *ADEM*, which stands for an Authentic Digital EMblem.
+International Humanitarian Law (IHL) awards specific protections to certain assets, in particular, medical facilities.
+These protections require that assets must be respected and protected, and in particular that assets must not be disrupted.
+The distinctive emblems recognized under IHL, for example, the Red Cross, can signal an assets status under IHL.
+But naturally, these emblems are visual and are thus limited to assets with which one interacts primarily physically, e.g., buildings.
+There is currently no way to signal over the network layer that a network-connected asset enjoys specific protections under IHL, which can be a channel of disruption, however.
 
-In ADEM, emblems are signed statements that mark *assets* as protected under IHL.
-Emblems are issued by *emblem issuers*.
-Emblem issuers can be authorized by *authorities*.
-Authorities do so by signing *endorsements* for emblem issuers.
-We call both emblems and endorsements *tokens*.
-Emblems are consumed and validated by *validators*.
+This draft addresses the above problem and specifies a message format and authorization model for the distinctive emblems recognized under IHL so that they can be conveyed on the network layer.
+Other drafts will specify how these messages will be conveyed over the network and which assets will be identified as enjoying specific protections under IHL.
 
 # Conventions and Definitions
 
@@ -65,20 +61,20 @@ Emblems are consumed and validated by *validators*.
 : An asset is a network-connected service that enjoys the specific protections under IHL.
 
 **Emblem**
-: An emblem signals that an asset enjoys specific protections under IHL.
+: An emblem is a message which signals that an asset enjoys specific protections under IHL.
 
 **Emblem issuer**
-: An emblem issuer is an organization entitled to issue claims of protection for their digital infrastructure.
+: An emblem issuer is an organization that issues emblems.
+
+**Authority**
+: An authority is an organization that authorizes other organizations as being eligible to issue emblems.
 
 **Endorsement**
 : An endorsement associates a public key with an identity, and hence, resembles the idea of a certificate.
 When signed by an authority, it attests that the authorized issuer can generally issue claims of protection.
 
-**Authority**
-: An authority is an organization that attests to a party's status as being eligible to issue emblems under IHL.
-
 **Token**
-: A token is either an emblem or an endorsement and is encoded as a signed CBOR Web Token (CWT).
+: An emblem or an endorsement.
 
 **Organization**
 : An emblem issuer or authority.
@@ -88,33 +84,52 @@ When signed by an authority, it attests that the authorized issuer can generally
 Any key that an organization commits to as described in {{pk-distribution}} is a root key.
 
 **Validator**
-: A validator is an agent interested in observing and verifying digital emblems.
+: A validator is someone who discovers and validates digital emblems.
 
 Beyond these terms, we use the terms "claim", "claim key", "claim value", and "CWT Claims Set" as defined in {{!RFC8392}}, and "header parameter" as defined in {{!RFC9052}}.
 
 # Overview
 
-This document defines ADEM's message format and authorization model.
-Emblems and endorsements are signed CWTs: an emblem marks assets for one or more emblem purposes, while an endorsement associates a signing key with an organization and authorizes specific purposes.
-Endorsements can form a chain within an organization, and authorities can endorse an organization's root key.
-Organizations commit to root keys through certificates recorded in Certificate Transparency (CT) logs.
+This document specifies the digital message format and authorization model for an authentic digital, distinctive emblem recognized under IHL.
+Emblems signal that one or more asset enjoys specific protections under IHL, and endorsements encode that one organization authorizes another to issue emblems.
+Both emblems and endorsements are called *tokens* and encoded as signed CBOR Web Tokens (CWTs) {{!RFC8392}}.
+Emblems are signed by emblem issuers and endorsements are signed by emblem issuers and authorities.
 
-In the following, we specify a public key format for use in ADEM, the format of emblems and endorsements as *tokens*, and the validation of sets of public keys and tokens.
-Separate documents will specify how tokens and public keys are discovered and transported, and how assets are identified.
+Endorsements also allow for authenticating public key material for verifying token signatures.
+Any organization, emblem issuer or authority, is identified by a domain name and one or more root public keys, which they can use to sign endorsements.
+Organizations must bind this root public key to the domain name identifying as specified in {{pk-distribution}}.
 
-# Key Identifiers and Key Formats {#key-formats}
+In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys ({{key-formats}}), (ii) the format of tokens ({{tokens}}), (iii) how organizations must bind their root public keys to the domain name identifying them ({{pk-distribution}}), and (iv) how emblems and associated endorsements are validated ({{validation}}).
 
-Public keys are encoded as COSE_Key structures {{!RFC9052}} and MUST include the `alg` parameter (label 3).
-The key's `alg` value MUST equal the `alg` value in the protected header of each token signed with that key.
+This draft does not specify how tokens are presented, and how they identify which asset enjoys specific protections under IHL.
+Different types of assets, e.g., a patient database and a network-connected medical device, use different network channels and digital emblems should be both conveyed over the respective channels and use identifiers for the marked assets that match these channels.
 
+## Requirements
+
+ADEM was designed to provide the following requirements.
+We highlight three requirements in particular that informed the writing of this draft.
+
+1. Digital emblems should usable for a wide range of network-connected services.
+We thus encode emblems in binary, as CWTs. so that they can - in principle - be integrated into many existing, different protocols.
+2. The use of the distinctive emblems requires authorization by a competent authority; typically a state.
+States are the ultimate authority under IHL and must be able to operate independently of one another.
+Authorities thus require no further authentication, integration into root trust stores, or anything similar.
+Instead, we require that authorities commit to their public key material so that they can be held accountable when issuing fraudulent endorsements (see {{pk-distribution}} and {{accountability}}).
+3. As explained in {{!I-D.ietf-diem-requirements-03}}, the validation of digital, distinctive emblems should be undetectable.
+While this draft alone cannot provide undetectable validation, we ensure that undetectable validation is not precluded.
+In particular, we designed the emblem message format and authorization so that an emblem and associated endorsements can be validated mostly without follow-up queries (see also {{undet-validation}}).
+
+# Public Key Material {#key-formats}
+
+Public keys are encoded as COSE_Key structures {{!RFC9052}}.
 We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in {{!RFC9679}}.
-To force computation and thus verification of key identifiers, COSE_Key structures in the context of ADEM SHOULD NOT contain the `kid` parameter (label 2).
+To force computation and thus verification of key identifiers, COSE_Key structures SHOULD NOT contain the `kid` parameter (label 2).
 Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter.
 
 Key identifiers are encoded as a CBOR byte string when used as the COSE `kid` header parameter or as a CWT claim value.
 When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
 
-# Tokens
+# Tokens {#tokens}
 
 ## Organization Identifiers
 
@@ -278,7 +293,7 @@ We intentionally do not specify how clients should check a certificate's revocat
 It is RECOMMENDED that clients use offline revocation checks that are provided by major browser vendors, for example, [OneCRL or CRLite by Mozilla](https://wiki.mozilla.org/CA/Revocation_Checking_in_Firefox), or [CRLSet by Chrome](https://chromium.googlesource.com/playground/chromium-org-site/+/refs/heads/main/Home/chromium-security/crlsets.md).
 
 
-# Validation
+# Validation {#validation}
 
 Whenever a validator receives a set of tokens, they SHOULD validate it.
 Validation returns one or more of the following values and a set of OIs.
@@ -379,7 +394,11 @@ Validators SHOULD NOT accept emblems resulting only in `SIGNED` without authenti
 In such cases, validators should aim to authenticate the respective public keys via other, out-of-band methods.
 Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public keys, but might not be able to set up a signing infrastructure linking their assets to a root key.
 
-## No Endorsements without `iss`
+## Accountability {#accountability}
+
+TODO
+
+### No Endorsements without `iss`
 
 The procedures to verify organizational or endorsed emblems as specified in {{org-emblems}} and {{endorsed-emblems}} assume that the emblem's `iss` claim is defined.
 Practically speaking, this implies that parties can only go beyond pure public key authentication (where public keys need to be authenticated out-of-band) by stating an OI.
@@ -390,6 +409,10 @@ The constraints on well-configured OIs offer two beneficial security properties:
 * Parties cannot deny having used certain root public keys.
 
 These properties stem from parties needing to include a hash of their key in a TLS certificate, and consequently, in certificate transparency logs.
+
+## Undetectable Validation {#undet-validation}
+
+TODO
 
 # IANA Considerations
 
