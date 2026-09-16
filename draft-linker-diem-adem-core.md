@@ -204,7 +204,7 @@ An emblem's CWT Claims Set includes the common claims defined in {{common-token-
 | `assets` | `"assets"` | REQUIRED | Assets marked as protected | array |
 
 The `assets` claim contains asset identifiers.
-Their syntax, encoding, and matching semantics will be defined in separate drafts that specify distribution methods for ADEM tokens.
+Their syntax, encoding, and matching semantics will be defined in separate drafts that specify discovery and distribution of tokens.
 The asset identifier in the example below is illustrative.
 
 An emblem's `prp` claim specifies how the asset is marked.
@@ -248,17 +248,18 @@ An endorsement's CWT Claims Set includes the common claims defined in {{common-t
 | `sub` | 2 | RECOMMENDED | Endorsed organization, identified by their OI | tstr |
 | `key` | `"key"` | REQUIRED | Endorsed organization's public key thumbprint | bstr |
 | `end` | `"end"` | REQUIRED | Endorsed key can endorse further | bool |
+| `log` | `"log"` | see below | Root key commitment | array of maps as below |
 
 An endorsement's `prp` claim constrains what kind of emblems the endorsed organization may issue.
 Each bit set in the `prp` claim gives the endorsed organization permission to issue the respective emblem.
 An emblem is thus *valid* with respect to an endorsement if the bit-wise AND of the endorsement's `prp` claim and the emblem's `prp` claim is equal to the emblem's `prp` claim.
 
 We say that an endorsement *endorses* a token if its `key` claim equals the key identifier of the token's verification key, and its `sub` claim equals the token's `iss` claim.
-We note that the latter includes the possibility of both `sub` and `iss` being undefined.
+Note that the latter includes the possibility of both `sub` and `iss` being undefined.
 
-Endorsements MAY contain the `log` parameter in the protected header.
-If an endorsement was signed by a root key, its protected header MUST include `log`.
-The `log` parameter uses the text-string label `"log"` and identifies the CT logs that contain a binding certificate for the endorsement's verification key.
+Endorsements MAY contain the `log` claim.
+If an endorsement was signed by a root key, it MUST include the `log` claim.
+The `log` claim identifies the CT logs that contain a binding certificate for the endorsement's verification key.
 The value of `log` is an array of CBOR maps, each of which identifies a CT log entry that commits to the organization's root signing key (see {{pk-distribution}}).
 This standard supports log entries of both standard CT logs as specified in {{!RFC6962}} and tiled CT logs as specified in {{STATIC-CT}}.
 
@@ -273,18 +274,18 @@ For logs implementing {{STATIC-CT}}, a map in `log` MUST include the `index` ent
 
 # Public Key Commitment {#pk-distribution}
 
-Parties must undeniably link their root public keys to their OI.
-In this section, we specify how emblem issuers and authorities commit to certain, root public keys.
-A party MAY have multiple root public keys.
+Organizations must undeniably link some of their public keys to their OI, and we specify a public key commitment mechanism in this section to achieve that.
+Every public key an organization commits to in this way is a root public key.
+An organization MAY have multiple root public keys.
 For a root public key to be configured correctly, there MUST be an X.509 certificate that:
 
 * MUST NOT be revoked
-* MUST be logged in the Certificate Transparency logs {{!RFC6962}}, {{STATIC-CT}}
+* MUST be logged in the Certificate Transparency logs {{!RFC6962}} {{STATIC-CT}}
   * Note that log inclusion requires a valid certificate chain that leads to
   one of the log's accepted root certificates. Clients are RECOMMENDED to verify
   that this chain is valid and that none of the certificates along it have been
   revoked.
-* MUST be valid for at least all the following domains while not considering wildcards in the certificate subject (`<OI>` is understood to be a placeholder for the domain name in the party's OI):
+* MUST be valid for at least all the following domains while not considering wildcards in the certificate subject (`<OI>` is understood to be a placeholder for the domain name in the organization's OI):
   * `adem-configuration.<OI>`
   * For the textual representation `<KID>` of the root public key's key identifier, as specified in {{key-formats}}: `<KID>.adem-configuration.<OI>`
 
@@ -297,7 +298,7 @@ It is RECOMMENDED that clients use offline revocation checks that are provided b
 
 Whenever a validator receives a set of tokens, they SHOULD validate it.
 Validation returns one or more of the following values and a set of OIs.
-The set of OIs returned by the validation procedure encodes the OIs of endorsing parties for which validation passed.
+The set of OIs returned by the validation procedure encodes the OIs of endorsing organizations for which validation passed.
 
 1. `INVALID`
 2. `SIGNED`
@@ -401,14 +402,14 @@ TODO
 ### No Endorsements without `iss`
 
 The procedures to verify organizational or endorsed emblems as specified in {{org-emblems}} and {{endorsed-emblems}} assume that the emblem's `iss` claim is defined.
-Practically speaking, this implies that parties can only go beyond pure public key authentication (where public keys need to be authenticated out-of-band) by stating an OI.
+Practically speaking, this implies that one can only go beyond pure public key authentication (where public keys need to be authenticated out-of-band) by stating an OI.
 
 The constraints on well-configured OIs offer two beneficial security properties:
 
-* Parties cannot equivocate their keys, i.e., they need to commit to a consistent set of keys.
-* Parties cannot deny having used certain root public keys.
+* Organizations cannot equivocate their keys, i.e., they need to commit to a consistent set of keys.
+* Organizations cannot deny having used certain root public keys.
 
-These properties stem from parties needing to include a hash of their key in a TLS certificate, and consequently, in certificate transparency logs.
+These properties stem from organizations needing to include a hash of their key in a TLS certificate, and consequently, in certificate transparency logs.
 
 ## Undetectable Validation {#undet-validation}
 
