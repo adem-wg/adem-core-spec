@@ -4,13 +4,12 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>ADEM - Message Format and Authorization Model</title>
+<title>An Authentic Digital, Distinctive EMblem (ADEM) - Message Format and Authorization Model</title>
 <meta content="Felix Linker" name="author">
 <meta content="
-       In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
-This enables military units to identify assets as respected and protected under international humanitarian law.
-This draft specifies the message format and authorization model of a protective, digital emblem for network-connected infrastructure.
-Such emblems mark assets as protected under IHL analogously to the physical emblems. 
+       In times of armed conflict, the emblems recognized under International Humanitarian Law (IHL), such as the red cross, red crescent, and red crystal, are used to mark physical assets.
+This enables, e.g., the military to identify assets that enjoy the specific protections under IHL during their operations.
+This draft specifies the message format and authorization model for a digital emblem, which signals that network-connected services enjoy specific protections under IHL. 
     " name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
 <meta content="draft-linker-diem-adem-core-latest" name="ietf.draft">
@@ -1042,12 +1041,12 @@ svg {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">ADEM - Message Format and Authorization </td>
+<td class="center">An Authentic Digital, Distinctive EMblem</td>
 <td class="right">September 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Linker</td>
-<td class="center">Expires 19 March 2027</td>
+<td class="center">Expires 20 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1060,12 +1059,12 @@ svg {
 <dd class="internet-draft">draft-linker-diem-adem-core-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-15" class="published">15 September 2026</time>
+<time datetime="2026-09-16" class="published">16 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-19">19 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-20">20 March 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1074,13 +1073,12 @@ svg {
 </dd>
 </dl>
 </div>
-<h1 id="title">ADEM - Message Format and Authorization Model</h1>
+<h1 id="title">An Authentic Digital, Distinctive EMblem (ADEM) - Message Format and Authorization Model</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">In times of armed conflict, the protective emblems of the red cross, red crescent, and red crystal are used to mark physical assets.
-This enables military units to identify assets as respected and protected under international humanitarian law.
-This draft specifies the message format and authorization model of a protective, digital emblem for network-connected infrastructure.
-Such emblems mark assets as protected under IHL analogously to the physical emblems.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">In times of armed conflict, the emblems recognized under International Humanitarian Law (IHL), such as the red cross, red crescent, and red crystal, are used to mark physical assets.
+This enables, e.g., the military to identify assets that enjoy the specific protections under IHL during their operations.
+This draft specifies the message format and authorization model for a digital emblem, which signals that network-connected services enjoy specific protections under IHL.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1117,7 +1115,7 @@ Such emblems mark assets as protected under IHL analogously to the physical embl
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 19 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 20 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1153,10 +1151,15 @@ Such emblems mark assets as protected under IHL analogously to the physical embl
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-requirements" class="internal xref">Requirements</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-key-identifiers-and-key-for" class="internal xref">Key Identifiers and Key Formats</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-public-key-material" class="internal xref">Public Key Material</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-tokens" class="internal xref">Tokens</a></p>
@@ -1207,7 +1210,15 @@ Such emblems mark assets as protected under IHL analogously to the physical embl
                 <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-interpreting-validation-res" class="internal xref">Interpreting Validation Results</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-no-endorsements-without-iss" class="internal xref">No Endorsements without <code>iss</code></a></p>
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-accountability" class="internal xref">Accountability</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2.2.1">
+                    <p id="section-toc.1-1.9.2.2.2.1.1"><a href="#section-9.2.1" class="auto internal xref">9.2.1</a>.  <a href="#name-no-endorsements-without-iss" class="internal xref">No Endorsements without <code>iss</code></a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-undetectable-validation" class="internal xref">Undetectable Validation</a></p>
 </li>
             </ul>
 </li>
@@ -1229,16 +1240,13 @@ Such emblems mark assets as protected under IHL analogously to the physical embl
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">International Humanitarian Law (IHL) mandates that military units must not attack medical facilities, such as hospitals.
-The emblems of the red cross, red crescent, and red crystal are used to mark physical infrastructure (e.g., by a red cross painted on a hospital's rooftop), thereby enabling military units to identify those assets as protected under IHL.
-This document specifies the message format and authorization model of digital emblems for IHL that can be used to mark digital infrastructure as protected under IHL analogously to the physical emblems.
-We call this system <em>ADEM</em>, which stands for an Authentic Digital EMblem.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">In ADEM, emblems are signed statements that mark <em>assets</em> as protected under IHL.
-Emblems are issued by <em>emblem issuers</em>.
-Emblem issuers can be authorized by <em>authorities</em>.
-Authorities do so by signing <em>endorsements</em> for emblem issuers.
-We call both emblems and endorsements <em>tokens</em>.
-Emblems are consumed and validated by <em>validators</em>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-1">International Humanitarian Law (IHL) awards specific protections to certain assets, in particular, medical facilities.
+These protections require that assets must be respected and protected, and in particular that assets must not be disrupted.
+The distinctive emblems recognized under IHL, for example, the Red Cross, can signal an assets status under IHL.
+But naturally, these emblems are visual and are thus limited to assets with which one interacts primarily physically, e.g., buildings.
+There is currently no way to signal over the network layer that a network-connected asset enjoys specific protections under IHL, which can be a channel of disruption, however.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This draft addresses the above problem and specifies a message format and authorization model for the distinctive emblems recognized under IHL so that they can be conveyed on the network layer.
+Other drafts will specify how these messages will be conveyed over the network and which assets will be identified as enjoying specific protections under IHL.<a href="#section-1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1258,28 +1266,28 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <dd class="break"></dd>
 <dt id="section-2-2.3"><strong>Emblem</strong></dt>
         <dd style="margin-left: 1.5em" id="section-2-2.4">
-          <p id="section-2-2.4.1">An emblem signals that an asset enjoys specific protections under IHL.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.4.1">An emblem is a message which signals that an asset enjoys specific protections under IHL.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-2-2.5"><strong>Emblem issuer</strong></dt>
         <dd style="margin-left: 1.5em" id="section-2-2.6">
-          <p id="section-2-2.6.1">An emblem issuer is an organization entitled to issue claims of protection for their digital infrastructure.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.6.1">An emblem issuer is an organization that issues emblems.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-2.7"><strong>Endorsement</strong></dt>
+<dt id="section-2-2.7"><strong>Authority</strong></dt>
         <dd style="margin-left: 1.5em" id="section-2-2.8">
-          <p id="section-2-2.8.1">An endorsement associates a public key with an identity, and hence, resembles the idea of a certificate.
-When signed by an authority, it attests that the authorized issuer can generally issue claims of protection.<a href="#section-2-2.8.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.8.1">An authority is an organization that authorizes other organizations as being eligible to issue emblems.<a href="#section-2-2.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-2.9"><strong>Authority</strong></dt>
+<dt id="section-2-2.9"><strong>Endorsement</strong></dt>
         <dd style="margin-left: 1.5em" id="section-2-2.10">
-          <p id="section-2-2.10.1">An authority is an organization that attests to a party's status as being eligible to issue emblems under IHL.<a href="#section-2-2.10.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.10.1">An endorsement associates a public key with an identity, and hence, resembles the idea of a certificate.
+When signed by an authority, it attests that the authorized issuer can generally issue claims of protection.<a href="#section-2-2.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-2-2.11"><strong>Token</strong></dt>
         <dd style="margin-left: 1.5em" id="section-2-2.12">
-          <p id="section-2-2.12.1">A token is either an emblem or an endorsement and is encoded as a signed CBOR Web Token (CWT).<a href="#section-2-2.12.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.12.1">An emblem or an endorsement.<a href="#section-2-2.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-2-2.13"><strong>Organization</strong></dt>
@@ -1295,7 +1303,7 @@ Any key that an organization commits to as described in <a href="#pk-distributio
         <dd class="break"></dd>
 <dt id="section-2-2.17"><strong>Validator</strong></dt>
         <dd style="margin-left: 1.5em" id="section-2-2.18">
-          <p id="section-2-2.18.1">A validator is an agent interested in observing and verifying digital emblems.<a href="#section-2-2.18.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.18.1">A validator is someone who discovers and validates digital emblems.<a href="#section-2-2.18.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1307,26 +1315,55 @@ Any key that an organization commits to as described in <a href="#pk-distributio
       <h2 id="name-overview">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
       </h2>
-<p id="section-3-1">This document defines ADEM's message format and authorization model.
-Emblems and endorsements are signed CWTs: an emblem marks assets for one or more emblem purposes, while an endorsement associates a signing key with an organization and authorizes specific purposes.
-Endorsements can form a chain within an organization, and authorities can endorse an organization's root key.
-Organizations commit to root keys through certificates recorded in Certificate Transparency (CT) logs.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">In the following, we specify a public key format for use in ADEM, the format of emblems and endorsements as <em>tokens</em>, and the validation of sets of public keys and tokens.
-Separate documents will specify how tokens and public keys are discovered and transported, and how assets are identified.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-1">This document specifies the digital message format and authorization model for an authentic digital, distinctive emblem recognized under IHL.
+Emblems signal that one or more asset enjoys specific protections under IHL, and endorsements encode that one organization authorizes another to issue emblems.
+Both emblems and endorsements are called <em>tokens</em> and encoded as signed CBOR Web Tokens (CWTs) <span>[<a href="#RFC8392" class="cite xref">RFC8392</a>]</span>.
+Emblems are signed by emblem issuers and endorsements are signed by emblem issuers and authorities.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">Endorsements also allow for authenticating public key material for verifying token signatures.
+Any organization, emblem issuer or authority, is identified by a domain name and one or more root public keys, which they can use to sign endorsements.
+Organizations must bind this root public key to the domain name identifying as specified in <a href="#pk-distribution" class="auto internal xref">Section 6</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys (<a href="#key-formats" class="auto internal xref">Section 4</a>), (ii) the format of tokens (<a href="#tokens" class="auto internal xref">Section 5</a>), (iii) how organizations must bind their root public keys to the domain name identifying them (<a href="#pk-distribution" class="auto internal xref">Section 6</a>), and (iv) how emblems and associated endorsements are validated (<a href="#validation" class="auto internal xref">Section 7</a>).<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">This draft does not specify how tokens are presented, and how they identify which asset enjoys specific protections under IHL.
+Different types of assets, e.g., a patient database and a network-connected medical device, use different network channels and digital emblems should be both conveyed over the respective channels and use identifiers for the marked assets that match these channels.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<div id="requirements">
+<section id="section-3.1">
+        <h3 id="name-requirements">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-requirements" class="section-name selfRef">Requirements</a>
+        </h3>
+<p id="section-3.1-1">ADEM was designed to provide the following requirements.
+We highlight three requirements in particular that informed the writing of this draft.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.1-2">
+<li id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1">Digital emblems should usable for a wide range of network-connected services.
+We thus encode emblems in binary, as CWTs. so that they can - in principle - be integrated into many existing, different protocols.<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1">The use of the distinctive emblems requires authorization by a competent authority; typically a state.
+States are the ultimate authority under IHL and must be able to operate independently of one another.
+Authorities thus require no further authentication, integration into root trust stores, or anything similar.
+Instead, we require that authorities commit to their public key material so that they can be held accountable when issuing fraudulent endorsements (see <a href="#pk-distribution" class="auto internal xref">Section 6</a> and <a href="#accountability" class="auto internal xref">Section 9.2</a>).<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1">As explained in <span>[<a href="#I-D.ietf-diem-requirements-03" class="cite xref">I-D.ietf-diem-requirements-03</a>]</span>, the validation of digital, distinctive emblems should be undetectable.
+While this draft alone cannot provide undetectable validation, we ensure that undetectable validation is not precluded.
+In particular, we designed the emblem message format and authorization so that an emblem and associated endorsements can be validated mostly without follow-up queries (see also <a href="#undet-validation" class="auto internal xref">Section 9.3</a>).<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
 </section>
 </div>
 <div id="key-formats">
 <section id="section-4">
-      <h2 id="name-key-identifiers-and-key-for">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-key-identifiers-and-key-for" class="section-name selfRef">Key Identifiers and Key Formats</a>
+      <h2 id="name-public-key-material">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-public-key-material" class="section-name selfRef">Public Key Material</a>
       </h2>
-<p id="section-4-1">Public keys are encoded as COSE_Key structures <span>[<a href="#RFC9052" class="cite xref">RFC9052</a>]</span> and <span class="bcp14">MUST</span> include the <code>alg</code> parameter (label 3).
-The key's <code>alg</code> value <span class="bcp14">MUST</span> equal the <code>alg</code> value in the protected header of each token signed with that key.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in <span>[<a href="#RFC9679" class="cite xref">RFC9679</a>]</span>.
-To force computation and thus verification of key identifiers, COSE_Key structures in the context of ADEM <span class="bcp14">SHOULD NOT</span> contain the <code>kid</code> parameter (label 2).
-Implementations that encode key material <span class="bcp14">MUST NOT</span> include the <code>kid</code> parameter, but implementations consuming key material <span class="bcp14">SHOULD</span> accept and ignore the <code>kid</code> parameter.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">Key identifiers are encoded as a CBOR byte string when used as the COSE <code>kid</code> header parameter or as a CWT claim value.
-When a textual representation is required, key identifiers are encoded using base32 as specified in <span>[<a href="#RFC4648" class="cite xref">RFC4648</a>]</span>, in lowercase and without trailing <code>=</code> characters.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-1">Public keys are encoded as COSE_Key structures <span>[<a href="#RFC9052" class="cite xref">RFC9052</a>]</span>.
+We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in <span>[<a href="#RFC9679" class="cite xref">RFC9679</a>]</span>.
+To force computation and thus verification of key identifiers, COSE_Key structures <span class="bcp14">SHOULD NOT</span> contain the <code>kid</code> parameter (label 2).
+Implementations that encode key material <span class="bcp14">MUST NOT</span> include the <code>kid</code> parameter, but implementations consuming key material <span class="bcp14">SHOULD</span> accept and ignore the <code>kid</code> parameter.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">Key identifiers are encoded as a CBOR byte string when used as the COSE <code>kid</code> header parameter or as a CWT claim value.
+When a textual representation is required, key identifiers are encoded using base32 as specified in <span>[<a href="#RFC4648" class="cite xref">RFC4648</a>]</span>, in lowercase and without trailing <code>=</code> characters.<a href="#section-4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="tokens">
@@ -1547,7 +1584,7 @@ The semantics of the <code>prp</code> claim differ between emblems and endorseme
             </tbody>
           </table>
 <p id="section-5.2.2-3">The <code>assets</code> claim contains asset identifiers.
-Their syntax, encoding, and matching semantics will be defined in separate drafts that specify distribution methods for ADEM tokens.
+Their syntax, encoding, and matching semantics will be defined in separate drafts that specify discovery and distribution of tokens.
 The asset identifier in the example below is illustrative.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.2.2-4">An emblem's <code>prp</code> claim specifies how the asset is marked.
 For example, when the claim has value 1, it indicates that the asset is marked with the digital equivalent to the emblems of the Red Cross, Red Crescent, and Red Crystal.<a href="#section-5.2.2-4" class="pilcrow">¶</a></p>
@@ -1641,16 +1678,27 @@ An endorsement's CWT Claims Set includes the common claims defined in <a href="#
                 <td class="text-left" rowspan="1" colspan="1">Endorsed key can endorse further</td>
                 <td class="text-left" rowspan="1" colspan="1">bool</td>
               </tr>
+              <tr>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <code>log</code>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">
+                  <code>"log"</code>
+</td>
+                <td class="text-left" rowspan="1" colspan="1">see below</td>
+                <td class="text-left" rowspan="1" colspan="1">Root key commitment</td>
+                <td class="text-left" rowspan="1" colspan="1">array of maps as below</td>
+              </tr>
             </tbody>
           </table>
 <p id="section-5.2.3-3">An endorsement's <code>prp</code> claim constrains what kind of emblems the endorsed organization may issue.
 Each bit set in the <code>prp</code> claim gives the endorsed organization permission to issue the respective emblem.
 An emblem is thus <em>valid</em> with respect to an endorsement if the bit-wise AND of the endorsement's <code>prp</code> claim and the emblem's <code>prp</code> claim is equal to the emblem's <code>prp</code> claim.<a href="#section-5.2.3-3" class="pilcrow">¶</a></p>
 <p id="section-5.2.3-4">We say that an endorsement <em>endorses</em> a token if its <code>key</code> claim equals the key identifier of the token's verification key, and its <code>sub</code> claim equals the token's <code>iss</code> claim.
-We note that the latter includes the possibility of both <code>sub</code> and <code>iss</code> being undefined.<a href="#section-5.2.3-4" class="pilcrow">¶</a></p>
-<p id="section-5.2.3-5">Endorsements <span class="bcp14">MAY</span> contain the <code>log</code> parameter in the protected header.
-If an endorsement was signed by a root key, its protected header <span class="bcp14">MUST</span> include <code>log</code>.
-The <code>log</code> parameter uses the text-string label <code>"log"</code> and identifies the CT logs that contain a binding certificate for the endorsement's verification key.
+Note that the latter includes the possibility of both <code>sub</code> and <code>iss</code> being undefined.<a href="#section-5.2.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.3-5">Endorsements <span class="bcp14">MAY</span> contain the <code>log</code> claim.
+If an endorsement was signed by a root key, it <span class="bcp14">MUST</span> include the <code>log</code> claim.
+The <code>log</code> claim identifies the CT logs that contain a binding certificate for the endorsement's verification key.
 The value of <code>log</code> is an array of CBOR maps, each of which identifies a CT log entry that commits to the organization's root signing key (see <a href="#pk-distribution" class="auto internal xref">Section 6</a>).
 This standard supports log entries of both standard CT logs as specified in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and tiled CT logs as specified in <span>[<a href="#STATIC-CT" class="cite xref">STATIC-CT</a>]</span>.<a href="#section-5.2.3-5" class="pilcrow">¶</a></p>
 <table class="center" id="table-5">
@@ -1715,16 +1763,16 @@ For logs implementing <span>[<a href="#STATIC-CT" class="cite xref">STATIC-CT</a
       <h2 id="name-public-key-commitment">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-public-key-commitment" class="section-name selfRef">Public Key Commitment</a>
       </h2>
-<p id="section-6-1">Parties must undeniably link their root public keys to their OI.
-In this section, we specify how emblem issuers and authorities commit to certain, root public keys.
-A party <span class="bcp14">MAY</span> have multiple root public keys.
+<p id="section-6-1">Organizations must undeniably link some of their public keys to their OI, and we specify a public key commitment mechanism in this section to achieve that.
+Every public key an organization commits to in this way is a root public key.
+An organization <span class="bcp14">MAY</span> have multiple root public keys.
 For a root public key to be configured correctly, there <span class="bcp14">MUST</span> be an X.509 certificate that:<a href="#section-6-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6-2.1">
           <p id="section-6-2.1.1"><span class="bcp14">MUST NOT</span> be revoked<a href="#section-6-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-6-2.2">
-          <p id="section-6-2.2.1"><span class="bcp14">MUST</span> be logged in the Certificate Transparency logs <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>, <span>[<a href="#STATIC-CT" class="cite xref">STATIC-CT</a>]</span><a href="#section-6-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-6-2.2.1"><span class="bcp14">MUST</span> be logged in the Certificate Transparency logs <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> <span>[<a href="#STATIC-CT" class="cite xref">STATIC-CT</a>]</span><a href="#section-6-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6-2.2.2.1">
               <p id="section-6-2.2.2.1.1">Note that log inclusion requires a valid certificate chain that leads to
@@ -1735,7 +1783,7 @@ revoked.<a href="#section-6-2.2.2.1.1" class="pilcrow">¶</a></p>
           </ul>
 </li>
         <li class="normal" id="section-6-2.3">
-          <p id="section-6-2.3.1"><span class="bcp14">MUST</span> be valid for at least all the following domains while not considering wildcards in the certificate subject (<code>&lt;OI&gt;</code> is understood to be a placeholder for the domain name in the party's OI):<a href="#section-6-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-6-2.3.1"><span class="bcp14">MUST</span> be valid for at least all the following domains while not considering wildcards in the certificate subject (<code>&lt;OI&gt;</code> is understood to be a placeholder for the domain name in the organization's OI):<a href="#section-6-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6-2.3.2.1">
               <p id="section-6-2.3.2.1.1"><code>adem-configuration.&lt;OI&gt;</code><a href="#section-6-2.3.2.1.1" class="pilcrow">¶</a></p>
@@ -1757,7 +1805,7 @@ It is <span class="bcp14">RECOMMENDED</span> that clients use offline revocation
       </h2>
 <p id="section-7-1">Whenever a validator receives a set of tokens, they <span class="bcp14">SHOULD</span> validate it.
 Validation returns one or more of the following values and a set of OIs.
-The set of OIs returned by the validation procedure encodes the OIs of endorsing parties for which validation passed.<a href="#section-7-1" class="pilcrow">¶</a></p>
+The set of OIs returned by the validation procedure encodes the OIs of endorsing organizations for which validation passed.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7-2">
 <li id="section-7-2.1">
           <p id="section-7-2.1.1"><code>INVALID</code><a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
@@ -1968,23 +2016,39 @@ In such cases, validators should aim to authenticate the respective public keys 
 Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public keys, but might not be able to set up a signing infrastructure linking their assets to a root key.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="no-endorsements-without-iss">
+<div id="accountability">
 <section id="section-9.2">
-        <h3 id="name-no-endorsements-without-iss">
-<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-no-endorsements-without-iss" class="section-name selfRef">No Endorsements without <code>iss</code></a>
+        <h3 id="name-accountability">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-accountability" class="section-name selfRef">Accountability</a>
         </h3>
-<p id="section-9.2-1">The procedures to verify organizational or endorsed emblems as specified in <a href="#org-emblems" class="auto internal xref">Section 8.2</a> and <a href="#endorsed-emblems" class="auto internal xref">Section 8.3</a> assume that the emblem's <code>iss</code> claim is defined.
-Practically speaking, this implies that parties can only go beyond pure public key authentication (where public keys need to be authenticated out-of-band) by stating an OI.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
-<p id="section-9.2-2">The constraints on well-configured OIs offer two beneficial security properties:<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<p id="section-9.2-1">TODO<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<div id="no-endorsements-without-iss">
+<section id="section-9.2.1">
+          <h4 id="name-no-endorsements-without-iss">
+<a href="#section-9.2.1" class="section-number selfRef">9.2.1. </a><a href="#name-no-endorsements-without-iss" class="section-name selfRef">No Endorsements without <code>iss</code></a>
+          </h4>
+<p id="section-9.2.1-1">The procedures to verify organizational or endorsed emblems as specified in <a href="#org-emblems" class="auto internal xref">Section 8.2</a> and <a href="#endorsed-emblems" class="auto internal xref">Section 8.3</a> assume that the emblem's <code>iss</code> claim is defined.
+Practically speaking, this implies that one can only go beyond pure public key authentication (where public keys need to be authenticated out-of-band) by stating an OI.<a href="#section-9.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.2.1-2">The constraints on well-configured OIs offer two beneficial security properties:<a href="#section-9.2.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9.2-3.1">
-            <p id="section-9.2-3.1.1">Parties cannot equivocate their keys, i.e., they need to commit to a consistent set of keys.<a href="#section-9.2-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-9.2.1-3.1">
+              <p id="section-9.2.1-3.1.1">Organizations cannot equivocate their keys, i.e., they need to commit to a consistent set of keys.<a href="#section-9.2.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-9.2-3.2">
-            <p id="section-9.2-3.2.1">Parties cannot deny having used certain root public keys.<a href="#section-9.2-3.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-9.2.1-3.2">
+              <p id="section-9.2.1-3.2.1">Organizations cannot deny having used certain root public keys.<a href="#section-9.2.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
-<p id="section-9.2-4">These properties stem from parties needing to include a hash of their key in a TLS certificate, and consequently, in certificate transparency logs.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+          </ul>
+<p id="section-9.2.1-4">These properties stem from organizations needing to include a hash of their key in a TLS certificate, and consequently, in certificate transparency logs.<a href="#section-9.2.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="undet-validation">
+<section id="section-9.3">
+        <h3 id="name-undetectable-validation">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-undetectable-validation" class="section-name selfRef">Undetectable Validation</a>
+        </h3>
+<p id="section-9.3-1">TODO<a href="#section-9.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2003,6 +2067,10 @@ Practically speaking, this implies that parties can only go beyond pure public k
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
+<dt id="I-D.ietf-diem-requirements-03">[I-D.ietf-diem-requirements-03]</dt>
+      <dd>
+<span class="refAuthor">Fainchtein, R. A.</span>, <span class="refAuthor">Linker, F.</span>, <span class="refAuthor">Rosenberg, A.</span>, <span class="refAuthor">Deccio, C.</span>, and <span class="refAuthor">A. Mankin</span>, <span class="refTitle">"Digital Emblems - Use Cases and Requirements"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-diem-requirements-03</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-diem-requirements-03">https://datatracker.ietf.org/doc/html/draft-ietf-diem-requirements-03</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
