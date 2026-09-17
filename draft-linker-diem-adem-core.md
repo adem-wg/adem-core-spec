@@ -46,7 +46,7 @@ This draft specifies the message format and authorization model for a digital em
 
 International Humanitarian Law (IHL) awards specific protections to certain assets, in particular, medical facilities.
 These protections require that assets must be respected and protected, and in particular that assets must not be disrupted.
-The distinctive emblems recognized under IHL, for example, the Red Cross, can signal an assets status under IHL.
+The distinctive emblems recognized under IHL, for example, the Red Cross, can signal an asset's status under IHL.
 But naturally, these emblems are visual and are thus limited to assets with which one interacts primarily physically, e.g., buildings.
 There is currently no way to signal over the network layer that a network-connected asset enjoys specific protections under IHL, which can be a channel of disruption, however.
 
@@ -91,13 +91,13 @@ Beyond these terms, we use the terms "claim", "claim key", "claim value", and "C
 # Overview
 
 This document specifies the digital message format and authorization model for an authentic digital, distinctive emblem recognized under IHL.
-Emblems signal that one or more asset enjoys specific protections under IHL, and endorsements encode that one organization authorizes another to issue emblems.
+Emblems signal that one or more assets enjoy specific protections under IHL, and endorsements encode that one organization authorizes another to issue emblems.
 Both emblems and endorsements are called *tokens* and encoded as signed CBOR Web Tokens (CWTs) {{!RFC8392}}.
 Emblems are signed by emblem issuers and endorsements are signed by emblem issuers and authorities.
 
 Endorsements also allow for authenticating public key material for verifying token signatures.
 Any organization, emblem issuer or authority, is identified by a domain name and one or more root public keys, which they can use to sign endorsements.
-Organizations must bind this root public key to the domain name identifying as specified in {{pk-distribution}}.
+Organizations must bind this root public key to the domain name identifying them as specified in {{pk-distribution}}.
 
 In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys ({{key-formats}}), (ii) the format of tokens ({{tokens}}), (iii) how organizations must bind their root public keys to the domain name identifying them ({{pk-distribution}}), and (iv) how emblems and associated endorsements are validated ({{validation}}).
 
@@ -109,8 +109,8 @@ Different types of assets, e.g., a patient database and a network-connected medi
 ADEM was designed to provide the following requirements.
 We highlight three requirements in particular that informed the writing of this draft.
 
-1. Digital emblems should usable for a wide range of network-connected services.
-We thus encode emblems in binary, as CWTs. so that they can - in principle - be integrated into many existing, different protocols.
+1. Digital emblems should be usable for a wide range of network-connected services.
+We thus encode emblems in binary, as CWTs, so that they can - in principle - be integrated into many existing, different protocols.
 2. The use of the distinctive emblems requires authorization by a competent authority; typically a state.
 States are the ultimate authority under IHL and must be able to operate independently of one another.
 Authorities thus require no further authentication, integration into root trust stores, or anything similar.
