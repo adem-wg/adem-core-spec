@@ -254,10 +254,10 @@ Table of Contents
 5.2.  Token Encoding
 
    Tokens MUST be encoded as CWTs [RFC8392] secured by a COSE_Sign1
-   structure [RFC9052], and tokens MUST include the CWT CBOR tag 61 and
-   the COSE_Sign1 CBOR tag 18.  The COSE payload MUST be present and
-   MUST contain the CBOR-encoded CWT Claims Set. External additional
-   authenticated data MUST be the zero-length byte string.
+   structure [RFC9052], and tokens MUST include the COSE_Sign1 CBOR tag
+   18.  The COSE payload MUST be present and MUST contain the CBOR-
+   encoded CWT Claims Set. External additional authenticated data MUST
+   be the zero-length byte string.
 
    The CWT Claims Set MUST be a CBOR map.  Registered CWT claims use
    their integer claim keys from [RFC8392]; claims defined by this

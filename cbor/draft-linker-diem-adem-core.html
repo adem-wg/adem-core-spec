@@ -1394,7 +1394,7 @@ organization-identifier = "https://" FQDN
         <h3 id="name-token-encoding">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-token-encoding" class="section-name selfRef">Token Encoding</a>
         </h3>
-<p id="section-5.2-1">Tokens <span class="bcp14">MUST</span> be encoded as CWTs <span>[<a href="#RFC8392" class="cite xref">RFC8392</a>]</span> secured by a COSE_Sign1 structure <span>[<a href="#RFC9052" class="cite xref">RFC9052</a>]</span>, and tokens <span class="bcp14">MUST</span> include the CWT CBOR tag 61 and the COSE_Sign1 CBOR tag 18.
+<p id="section-5.2-1">Tokens <span class="bcp14">MUST</span> be encoded as CWTs <span>[<a href="#RFC8392" class="cite xref">RFC8392</a>]</span> secured by a COSE_Sign1 structure <span>[<a href="#RFC9052" class="cite xref">RFC9052</a>]</span>, and tokens <span class="bcp14">MUST</span> include the COSE_Sign1 CBOR tag 18.
 The COSE payload <span class="bcp14">MUST</span> be present and <span class="bcp14">MUST</span> contain the CBOR-encoded CWT Claims Set.
 External additional authenticated data <span class="bcp14">MUST</span> be the zero-length byte string.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">The CWT Claims Set <span class="bcp14">MUST</span> be a CBOR map.
