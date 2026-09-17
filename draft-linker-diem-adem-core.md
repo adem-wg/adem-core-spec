@@ -146,7 +146,7 @@ organization-identifier = "https://" FQDN
 
 ## Token Encoding
 
-Tokens MUST be encoded as CWTs {{!RFC8392}} secured by a COSE_Sign1 structure {{!RFC9052}}, and tokens MUST include the CWT CBOR tag 61 and the COSE_Sign1 CBOR tag 18.
+Tokens MUST be encoded as CWTs {{!RFC8392}} secured by a COSE_Sign1 structure {{!RFC9052}}, and tokens MUST include the COSE_Sign1 CBOR tag 18.
 The COSE payload MUST be present and MUST contain the CBOR-encoded CWT Claims Set.
 External additional authenticated data MUST be the zero-length byte string.
 
