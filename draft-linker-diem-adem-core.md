@@ -37,7 +37,7 @@ informative:
 --- abstract
 
 In times of armed conflict, the emblems recognized under International Humanitarian Law (IHL), such as the red cross, red crescent, and red crystal, are used to mark physical assets.
-This enables, e.g., the military to identify assets that enjoy the specific protections under IHL during their operations.
+This enables, e.g., the military to identify assets that enjoy specific protections under IHL during their operations.
 This draft specifies the message format and authorization model for a digital emblem, which signals that network-connected services enjoy specific protections under IHL.
 
 --- middle
@@ -45,13 +45,13 @@ This draft specifies the message format and authorization model for a digital em
 # Introduction
 
 International Humanitarian Law (IHL) awards specific protections to certain assets, in particular, medical facilities.
-These protections require that assets must be respected and protected, and in particular that assets must not be disrupted.
+These protections require that assets must be respected and protected, and that assets must not be disrupted.
 The distinctive emblems recognized under IHL, for example, the Red Cross, can signal an asset's status under IHL.
 But naturally, these emblems are visual and are thus limited to assets with which one interacts primarily physically, e.g., buildings.
-There is currently no way to signal over the network layer that a network-connected asset enjoys specific protections under IHL, which can be a channel of disruption, however.
+There is currently no way to signal over the network layer that a network-connected asset enjoys specific protections, which can be a channel of disruption, however.
 
-This draft addresses the above problem and specifies a message format and authorization model for the distinctive emblems recognized under IHL so that they can be conveyed on the network layer.
-Other drafts will specify how these messages will be conveyed over the network and which assets will be identified as enjoying specific protections under IHL.
+This draft addresses the above problem and specifies a message format and authorization model for the distinctive emblems so that they can be conveyed over the network layer.
+Other drafts will specify how these messages will be sent and how assets will be identified as enjoying specific protections under IHL.
 
 # Conventions and Definitions
 
