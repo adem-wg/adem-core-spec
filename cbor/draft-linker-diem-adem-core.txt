@@ -3,9 +3,9 @@
 
 
 Digital Emblems                                                F. Linker
-Internet-Draft                                         16 September 2026
+Internet-Draft                                         17 September 2026
 Intended status: Informational                                          
-Expires: 20 March 2027
+Expires: 21 March 2027
 
 
   An Authentic Digital, Distinctive EMblem (ADEM) - Message Format and
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 March 2027.
+   This Internet-Draft will expire on 21 March 2027.
 
 Copyright Notice
 
@@ -106,7 +106,7 @@ Table of Contents
    require that assets must be respected and protected, and in
    particular that assets must not be disrupted.  The distinctive
    emblems recognized under IHL, for example, the Red Cross, can signal
-   an assets status under IHL.  But naturally, these emblems are visual
+   an asset's status under IHL.  But naturally, these emblems are visual
    and are thus limited to assets with which one interacts primarily
    physically, e.g., buildings.  There is currently no way to signal
    over the network layer that a network-connected asset enjoys specific
@@ -163,7 +163,7 @@ Table of Contents
 
    This document specifies the digital message format and authorization
    model for an authentic digital, distinctive emblem recognized under
-   IHL.  Emblems signal that one or more asset enjoys specific
+   IHL.  Emblems signal that one or more assets enjoy specific
    protections under IHL, and endorsements encode that one organization
    authorizes another to issue emblems.  Both emblems and endorsements
    are called _tokens_ and encoded as signed CBOR Web Tokens (CWTs)
@@ -174,8 +174,8 @@ Table of Contents
    verifying token signatures.  Any organization, emblem issuer or
    authority, is identified by a domain name and one or more root public
    keys, which they can use to sign endorsements.  Organizations must
-   bind this root public key to the domain name identifying as specified
-   in Section 6.
+   bind this root public key to the domain name identifying them as
+   specified in Section 6.
 
    In the following, we describe (i) how to encode public key material
    for the use in ADEM as COSE_Keys (Section 4), (ii) the format of
@@ -196,8 +196,8 @@ Table of Contents
    highlight three requirements in particular that informed the writing
    of this draft.
 
-   1.  Digital emblems should usable for a wide range of network-
-       connected services.  We thus encode emblems in binary, as CWTs.
+   1.  Digital emblems should be usable for a wide range of network-
+       connected services.  We thus encode emblems in binary, as CWTs,
        so that they can - in principle - be integrated into many
        existing, different protocols.
 
