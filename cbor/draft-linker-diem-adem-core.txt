@@ -3,9 +3,9 @@
 
 
 Digital Emblems                                                F. Linker
-Internet-Draft                                         17 September 2026
+Internet-Draft                                         24 September 2026
 Intended status: Informational                                          
-Expires: 21 March 2027
+Expires: 28 March 2027
 
 
   An Authentic Digital, Distinctive EMblem (ADEM) - Message Format and
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 March 2027.
+   This Internet-Draft will expire on 28 March 2027.
 
 Copyright Notice
 
@@ -172,9 +172,10 @@ Table of Contents
    Endorsements also allow for authenticating public key material for
    verifying token signatures.  Any organization, emblem issuer or
    authority, is identified by a domain name and one or more root public
-   keys, which they can use to sign endorsements.  Organizations must
-   bind this root public key to the domain name identifying them as
-   specified in Section 6.
+   keys, which they can use to sign endorsements.  Root keys are
+   configured as specified in Section 6.  This configuration was
+   designed so that it binds an organization's root keys to their domain
+   name.
 
    In the following, we describe (i) how to encode public key material
    for the use in ADEM as COSE_Keys (Section 4), (ii) the format of

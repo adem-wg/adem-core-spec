@@ -11,22 +11,22 @@
 This enables, e.g., the military to identify assets that enjoy specific protections under IHL during their operations.
 This draft specifies the message format and authorization model for a digital emblem, which signals that network-connected services enjoy specific protections under IHL. 
     " name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="draft-linker-diem-adem-core-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
+  xml2rfc 3.34.1
     Python 3.14.7
-    ConfigArgParse 1.7.5
+    ConfigArgParse 1.7.7
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.11.7
+    platformdirs 4.11.10
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.3
+    wcwidth 0.8.4
 -->
 <link href="draft-linker-diem-adem-core.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1046,7 +1046,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Linker</td>
-<td class="center">Expires 21 March 2027</td>
+<td class="center">Expires 28 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1059,12 +1059,12 @@ svg {
 <dd class="internet-draft">draft-linker-diem-adem-core-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-17" class="published">17 September 2026</time>
+<time datetime="2026-09-24" class="published">24 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-21">21 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-28">28 March 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1115,7 +1115,7 @@ This draft specifies the message format and authorization model for a digital em
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1321,7 +1321,8 @@ Both emblems and endorsements are called <em>tokens</em> and encoded as signed C
 Emblems are signed by emblem issuers and endorsements are signed by emblem issuers and authorities.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">Endorsements also allow for authenticating public key material for verifying token signatures.
 Any organization, emblem issuer or authority, is identified by a domain name and one or more root public keys, which they can use to sign endorsements.
-Organizations must bind this root public key to the domain name identifying them as specified in <a href="#pk-distribution" class="auto internal xref">Section 6</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
+Root keys are configured as specified in <a href="#pk-distribution" class="auto internal xref">Section 6</a>.
+This configuration was designed so that it binds an organization's root keys to their domain name.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys (<a href="#key-formats" class="auto internal xref">Section 4</a>), (ii) the format of tokens (<a href="#tokens" class="auto internal xref">Section 5</a>), (iii) how organizations must bind their root public keys to the domain name identifying them (<a href="#pk-distribution" class="auto internal xref">Section 6</a>), and (iv) how emblems and associated endorsements are validated (<a href="#validation" class="auto internal xref">Section 7</a>).<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">This draft does not specify how tokens are presented, and how they identify which asset enjoys specific protections under IHL.
 Different types of assets, e.g., a patient database and a network-connected medical device, use different network channels and digital emblems should be both conveyed over the respective channels and use identifiers for the marked assets that match these channels.<a href="#section-3-4" class="pilcrow">¶</a></p>
