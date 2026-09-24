@@ -97,7 +97,8 @@ Emblems are signed by emblem issuers and endorsements are signed by emblem issue
 
 Endorsements also allow for authenticating public key material for verifying token signatures.
 Any organization, emblem issuer or authority, is identified by a domain name and one or more root public keys, which they can use to sign endorsements.
-Organizations must bind this root public key to the domain name identifying them as specified in {{pk-distribution}}.
+Root keys are configured as specified in {{pk-distribution}}.
+This configuration was designed so that it binds an organization's root keys to their domain name.
 
 In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys ({{key-formats}}), (ii) the format of tokens ({{tokens}}), (iii) how organizations must bind their root public keys to the domain name identifying them ({{pk-distribution}}), and (iv) how emblems and associated endorsements are validated ({{validation}}).
 
