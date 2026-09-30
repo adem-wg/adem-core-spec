@@ -287,7 +287,7 @@ For a root public key to be configured correctly, there MUST be an X.509 certifi
   that this chain is valid and that none of the certificates along it have been
   revoked.
 * MUST be valid for at least all the following domains while not considering wildcards in the certificate subject (`<OI>` is understood to be a placeholder for the domain name in the organization's OI):
-  * `adem-configuration.<OI>`
+  * `<OI>`
   * For the textual representation `<KID>` of the root public key's key identifier, as specified in {{key-formats}}: `<KID>.adem-configuration.<OI>`
 
 <!-- TODO: Transform into informative references -->
