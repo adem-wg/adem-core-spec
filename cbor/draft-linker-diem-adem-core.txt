@@ -3,9 +3,9 @@
 
 
 Digital Emblems                                                F. Linker
-Internet-Draft                                         24 September 2026
+Internet-Draft                                         30 September 2026
 Intended status: Informational                                          
-Expires: 28 March 2027
+Expires: 3 April 2027
 
 
   An Authentic Digital, Distinctive EMblem (ADEM) - Message Format and
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 March 2027.
+   This Internet-Draft will expire on 3 April 2027.
 
 Copyright Notice
 
@@ -491,7 +491,7 @@ Table of Contents
       understood to be a placeholder for the domain name in the
       organization's OI):
 
-      -  adem-configuration.<OI>
+      -  <OI>
 
       -  For the textual representation <KID> of the root public key's
          key identifier, as specified in Section 4: <KID>.adem-
