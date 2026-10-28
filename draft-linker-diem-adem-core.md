@@ -71,7 +71,7 @@ Other drafts will specify how these messages will be sent and how assets will be
 
 **Endorsement**
 : An endorsement associates a public key with an identity, and hence, resembles the idea of a certificate.
-When signed by an authority, it attests that the authorized issuer can generally issue claims of protection.
+When signed by an authority, it asserts that the authorized issuer can generally issue claims of protection.
 
 **Token**
 : An emblem or an endorsement.
@@ -241,7 +241,7 @@ Claims Set:
 ### Endorsements {#endorsements}
 
 Endorsements are encoded as signed CWTs.
-Endorsements attest two statements: that a public key is affiliated with an organization, identified by an OI, and that this organization is authorized to issue emblems for their assets.
+Endorsements assert two statements: that a public key is affiliated with an organization, identified by an OI, and that this organization is authorized to issue emblems for their assets.
 An endorsement's CWT Claims Set includes the common claims defined in {{common-token-fields}} and the additional claims defined in the table below.
 
 | Claim | Claim key | Status | Semantics | CBOR type |
