@@ -95,12 +95,12 @@ This document specifies the digital message format and authorization model for a
 Emblems signal that one or more assets enjoy specific protections under IHL, and endorsements encode that one organization authorizes another to issue emblems.
 Both emblems and endorsements are called *tokens* and encoded as signed CBOR Web Tokens (CWTs) {{!RFC8392}}.
 Emblems are signed by emblem issuers and endorsements are signed by emblem issuers and authorities.
-Emblem issuer and authorities are identified by a domain name.
+Emblem issuers and authorities are identified by a domain name.
 
 Endorsements allow for authenticating public key material for verifying token signatures.
 Endorsements can be validated in two ways.
-First, a validator may already know an authentic public key for the issuer, e.g., from another endorsements.
-In this case, they can validate the endorsement's signature straightforward.
+First, a validator may already know an authentic public key for the issuer, e.g., from another endorsement.
+In this case, they can validate the endorsement's signature straightforwardly.
 Second, endorsements can be configured as trust anchors (see {{trust-anchors}}).
 Trust anchor endorsements allow a validator to authenticate an endorsement's verification key out-of-band, using Certificate Transparency (CT) logs {{!RFC6962}} {{STATIC-CT}}.
 Furthermore, trust anchor endorsements allow a validator to verify that an endorsement's issuer controls the domain name identifying them.
@@ -108,7 +108,7 @@ Furthermore, trust anchor endorsements allow a validator to verify that an endor
 In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys ({{key-formats}}), (ii) the format of tokens ({{tokens}}), and (iii) how emblems and associated endorsements are validated ({{validation}}).
 
 This draft does not specify how tokens are presented, and how they identify which asset enjoys specific protections under IHL.
-Different types of assets, e.g., a patient database and a network-connected medical device, use different network channels and digital emblems should be both conveyed over the respective channels and use identifiers for the marked assets that match these channels.
+Different types of assets, e.g., a patient database and a network-connected medical device, use different network channels and digital emblems should both be conveyed over the respective channels and use identifiers for the marked assets that match these channels.
 
 ## Requirements
 
@@ -117,7 +117,7 @@ We highlight three requirements in particular that informed the writing of this 
 
 1. Digital emblems should be usable for a wide range of network-connected services.
 We thus encode emblems in binary, as CWTs, so that they can - in principle - be integrated into many existing, different protocols.
-2. The use of the distinctive emblems requires authorization by a competent authority; typically a state.
+2. The use of the distinctive emblems requires authorization by a competent authority, typically a state.
 States are the ultimate authority under IHL and must be able to operate independently of one another.
 Authorities thus require no further authentication, integration into root trust stores, or anything similar.
 Instead, we require that authorities commit to their public key material so that they can be held accountable when issuing fraudulent endorsements (see {{pk-commitment}} and {{accountability}}).
@@ -145,7 +145,7 @@ We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumb
 To force computation and thus verification of key identifiers, COSE_Key structures SHOULD NOT contain the `kid` parameter (label 2).
 Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter.
 
-Key identifiers are encoded as a CBOR byte strings when used within CBOR objects.
+Key identifiers are encoded as CBOR byte strings when used within CBOR objects.
 When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
 
 ## Public Key Commitment {#pk-commitment}
@@ -182,15 +182,16 @@ Registered CWT claims use their integer claim keys from {{!RFC8392}}; claims def
 
 There are two types of tokens: emblems and endorsements.
 Furthermore, endorsements can be configured as trust anchors for an issuer, which allows their validation without obtaining further authentic public key material.
-To facilitate validation, tokens MUST include the `typ` (label 16, see {{!RFC9596}}) header parameter, which MUST be a string mediate value following the syntax of `adem-type` below.
+To facilitate validation, tokens MUST include the `typ` (label 16, see {{!RFC9596}}) header parameter, which MUST be a string media type value following the syntax of `adem-type` below.
 
 ~~~~
 adem-type = "application/adem+cwt; emblem=" ("0" / "1") [ "; trust-anchor=1" ]
 ~~~~
 
 The structured suffix `+cwt` indicates that tokens are encoded as CWTs {{STRUCT-SYNTAX}}.
-The parameter `emblem=` indicates whether the token is an emblem (`"1"`) or an endorsements (`"0"`), and the presence of the parameter `trust-anchor` indicates whether an endorsement is configured as a trust anchor (see {{trust-anchors}}).
-The parameter `trust-anchor` MUST only be present if `emblem=0`.
+The parameter `emblem=` indicates whether the token is an emblem (`"1"`) or an endorsement (`"0"`), and the presence of the parameter `trust-anchor` indicates whether an endorsement is configured as a trust anchor (see {{trust-anchors}}).
+The parameter `trust-anchor` is intended to aid parsing and validation of tokens and thus need not be validated itself.
+It SHOULD only be present if `emblem=0`.
 
 ### Common Token Fields {#common-token-fields}
 
@@ -303,12 +304,12 @@ An emblem is thus *valid* with respect to an endorsement if the bit-wise AND of 
 #### Trust Anchor Configuration {#trust-anchors}
 
 Endorsements MAY contain the `log` claim.
-If they do, they are a trust anchor.
+If they do, they are trust anchors.
 Trust anchor endorsements allow a validator to authenticate the endorsement's verification key out-of-band and check that the issuer controls their own OI (see {{ois}}).
 This is achieved by binding the endorsement's verification key to the issuer OI with a certificate stored in CT logs.
 
 The `log` claim identifies the CT logs that contain this binding certificate.
-The value of `log` is an array of CBOR maps, each of which identifies a CT log entry that stores a certificate committing to the endorsements's verification key as per {{pk-commitment}}.
+The value of `log` is an array of CBOR maps, each of which identifies a CT log entry that stores a certificate committing to the endorsement's verification key as per {{pk-commitment}}.
 This standard supports log entries of both standard CT logs as specified in {{!RFC6962}} and tiled CT logs as specified in {{STATIC-CT}}.
 
 | Entry | Map key | Status | Semantics | CBOR type |
@@ -338,7 +339,7 @@ Given a set of tokens and a set of public keys, validation takes the following s
     1. Verify the token's `typ` protected header parameter following {{token-types}}.
     2. Verify the token's signature using the public key whose key identifier computed in the previous step matches the `kid` header parameter.
     3. Verify the token's `nbf` and `exp` claims.
-    4. Should either of the aforementioned validation steps fail, discard this token.
+    4. Should any of the aforementioned validation steps fail, discard this token.
 3. Identify the emblem among the remaining tokens by its `typ` protected header parameter.
 Verify that there is only one emblem and that it contains the `assets` claim.
 If this check fails, return `INVALID`.
