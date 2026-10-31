@@ -364,12 +364,12 @@ Context:
 
 Algorithm:
 
-1. Ignore all endorsements including an `iss` claim different to the emblem's `iss` claim.
-An omitted `iss` claim is different to an included `iss` claim and equal to an omitted `iss` claim.
-2. If no endorsements remain, return `SIGNED`.
-Otherwise, verify that all endorsements form a consecutive chain where there is a unique root endorsement and the public key which was used to verify the emblem's signature is transitively endorsed by that root endorsement.
-3. Verify that all endorsements bear the claim `end=true` except for the endorsement endorsing the emblem's verification key, the `end` claim of which MAY be `false`.
-4. Verify that the emblem is valid with regard to every endorsement.
+1. Consider all endorsements including an `iss` claim equal to the emblem's `iss` claim.
+An omitted `iss` claim is not equal to an included `iss` claim but equal to an omitted `iss` claim.
+2. If there are no such endorsements, return `SIGNED`.
+Otherwise, verify that all such endorsements form a consecutive chain where there is a unique root endorsement and the public key which was used to verify the emblem's signature is transitively endorsed by that root endorsement.
+3. Verify that all such endorsements bear the claim `end=true` except for the endorsement endorsing the emblem's verification key, the `end` claim of which MAY be `false`.
+4. Verify that the emblem is valid with regard to every such endorsement.
 5. If any of the aforementioned validation steps fail, return `INVALID`.
 Otherwise, return `SIGNED`.
 
