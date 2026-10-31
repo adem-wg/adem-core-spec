@@ -29,6 +29,11 @@ normative:
     target: https://github.com/C2SP/C2SP/blob/0f3fddde7d1d8bd55e42723572c4c144457c50d0/static-ct-api.md
     title: The Static Certificate Transparency API
     date: 2026-03-20
+  STRUCT-SYNTAX:
+    target: https://www.iana.org/assignments/media-type-structured-suffix
+    title: Structured Syntax Suffixes
+    author:
+      org: IANA
 
 informative:
 
@@ -79,10 +84,6 @@ When signed by an authority, it asserts that the authorized issuer can generally
 **Organization**
 : An emblem issuer or authority.
 
-**Root Key**
-: Organizations control root keys, which identify them cryptographically.
-Any key that an organization commits to as described in {{pk-distribution}} is a root key.
-
 **Validator**
 : A validator is someone who discovers and validates digital emblems.
 
@@ -94,13 +95,17 @@ This document specifies the digital message format and authorization model for a
 Emblems signal that one or more assets enjoy specific protections under IHL, and endorsements encode that one organization authorizes another to issue emblems.
 Both emblems and endorsements are called *tokens* and encoded as signed CBOR Web Tokens (CWTs) {{!RFC8392}}.
 Emblems are signed by emblem issuers and endorsements are signed by emblem issuers and authorities.
+Emblem issuer and authorities are identified by a domain name.
 
-Endorsements also allow for authenticating public key material for verifying token signatures.
-Any organization, emblem issuer or authority, is identified by a domain name and one or more root public keys, which they can use to sign endorsements.
-Root keys are configured as specified in {{pk-distribution}}.
-This configuration was designed so that it binds an organization's root keys to their domain name.
+Endorsements allow for authenticating public key material for verifying token signatures.
+Endorsements can be validated in two ways.
+First, a validator may already know an authentic public key for the issuer, e.g., from another endorsements.
+In this case, they can validate the endorsement's signature straightforward.
+Second, endorsements can be configured as trust anchors (see {{trust-anchors}}).
+Trust anchor endorsements allow a validator to authenticate an endorsement's verification key out-of-band, using Certificate Transparency (CT) logs {{!RFC6962}} {{STATIC-CT}}.
+Furthermore, trust anchor endorsements allow a validator to verify that an endorsement's issuer controls the domain name identifying them.
 
-In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys ({{key-formats}}), (ii) the format of tokens ({{tokens}}), (iii) how organizations must bind their root public keys to the domain name identifying them ({{pk-distribution}}), and (iv) how emblems and associated endorsements are validated ({{validation}}).
+In the following, we describe (i) how to encode public key material for the use in ADEM as COSE_Keys ({{key-formats}}), (ii) the format of tokens ({{tokens}}), and (iii) how emblems and associated endorsements are validated ({{validation}}).
 
 This draft does not specify how tokens are presented, and how they identify which asset enjoys specific protections under IHL.
 Different types of assets, e.g., a patient database and a network-connected medical device, use different network channels and digital emblems should be both conveyed over the respective channels and use identifiers for the marked assets that match these channels.
@@ -115,24 +120,12 @@ We thus encode emblems in binary, as CWTs, so that they can - in principle - be 
 2. The use of the distinctive emblems requires authorization by a competent authority; typically a state.
 States are the ultimate authority under IHL and must be able to operate independently of one another.
 Authorities thus require no further authentication, integration into root trust stores, or anything similar.
-Instead, we require that authorities commit to their public key material so that they can be held accountable when issuing fraudulent endorsements (see {{pk-distribution}} and {{accountability}}).
+Instead, we require that authorities commit to their public key material so that they can be held accountable when issuing fraudulent endorsements (see {{pk-commitment}} and {{accountability}}).
 3. As explained in {{!I-D.ietf-diem-requirements-03}}, the validation of digital, distinctive emblems should be undetectable.
 While this draft alone cannot provide undetectable validation, we ensure that undetectable validation is not precluded.
 In particular, we designed the emblem message format and authorization so that an emblem and associated endorsements can be validated mostly without follow-up queries (see also {{undet-validation}}).
 
-# Public Key Material {#key-formats}
-
-Public keys are encoded as COSE_Key structures {{!RFC9052}}.
-We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in {{!RFC9679}}.
-To force computation and thus verification of key identifiers, COSE_Key structures SHOULD NOT contain the `kid` parameter (label 2).
-Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter.
-
-Key identifiers are encoded as a CBOR byte strings when used within CBOR objects.
-When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
-
-# Tokens {#tokens}
-
-## Organization Identifiers
+# Organization Identifiers {#ois}
 
 Emblems are issued for assets by emblem issuers, which in turn are authorized by authorities.
 Emblem issuers and authorities are identified by Uniform Resource Identifiers (URIs) {{!RFC3986}} of the following form, which we call *organization identifiers* (OIs).
@@ -145,6 +138,37 @@ Concretely, an OI has the syntax:
 organization-identifier = "https://" FQDN
 ~~~~
 
+# Public Key Material {#key-formats}
+
+Public keys are encoded as COSE_Key structures {{!RFC9052}}.
+We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumbprints, computed as specified in {{!RFC9679}}.
+To force computation and thus verification of key identifiers, COSE_Key structures SHOULD NOT contain the `kid` parameter (label 2).
+Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter.
+
+Key identifiers are encoded as a CBOR byte strings when used within CBOR objects.
+When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
+
+## Public Key Commitment {#pk-commitment}
+
+Organizations can bind some of their public keys to their OI, and we specify a public key commitment mechanism in this section to achieve that.
+For a public key to be bound to an OI, there MUST be an X.509 certificate that:
+
+* MUST NOT be revoked
+* MUST be logged in the Certificate Transparency logs {{!RFC6962}} {{STATIC-CT}}
+  * Note that log inclusion requires a valid certificate chain that leads to
+  one of the log's accepted root certificates. Clients are RECOMMENDED to verify
+  that this chain is valid and that none of the certificates along it have been
+  revoked.
+* MUST be valid for at least all the following domains while not considering wildcards in the certificate subject (`<OI>` is understood to be a placeholder for the domain name in the organization's OI):
+  * `<OI>`
+  * For the textual representation `<KID>` of the bound public key's key identifier, as specified in {{key-formats}}: `<KID>.adem-configuration.<OI>`
+
+<!-- TODO: Transform into informative references -->
+We intentionally do not specify how clients should check a certificate's revocation status.
+It is RECOMMENDED that clients use offline revocation checks that are provided by major browser vendors, for example, [OneCRL or CRLite by Mozilla](https://wiki.mozilla.org/CA/Revocation_Checking_in_Firefox), or [CRLSet by Chrome](https://chromium.googlesource.com/playground/chromium-org-site/+/refs/heads/main/Home/chromium-security/crlsets.md).
+
+# Tokens {#tokens}
+
 ## Token Encoding
 
 Tokens MUST be encoded as CWTs {{!RFC8392}} secured by a COSE_Sign1 structure {{!RFC9052}}, and tokens MUST include the COSE_Sign1 CBOR tag 18.
@@ -154,17 +178,28 @@ External additional authenticated data MUST be the zero-length byte string.
 The CWT Claims Set MUST be a CBOR map.
 Registered CWT claims use their integer claim keys from {{!RFC8392}}; claims defined by this document use the text-string claim keys shown below.
 
+### Token Types
+
+There are two types of tokens: emblems and endorsements.
+Furthermore, endorsements can be configured as trust anchors for an issuer, which allows their validation without obtaining further authentic public key material.
+To facilitate validation, tokens MUST include the `typ` (label 16, see {{!RFC9596}}) header parameter, which MUST be a string mediate value following the syntax of `adem-type` below.
+
+~~~~
+adem-type = "application/adem+cwt; emblem=" ("0" / "1") [ " trust-anchor" ]
+~~~~
+
+The structured suffix `+cwt` indicates that tokens are encoded as CWTs {{STRUCT-SYNTAX}}.
+The parameter `emblem=` indicates whether the token is an emblem (`"1"`) or an endorsements (`"0"`), and the presence of the parameter `trust-anchor` indicates whether an endorsement is configured as a trust anchor (see {{trust-anchors}}).
+The parameter `trust-anchor` MUST only be present if `emblem=0`.
+
 ### Common Token Fields {#common-token-fields}
 
 Both emblems and endorsements use the following protected header parameters and CWT claims.
 Implementations generating tokens MUST NOT include header parameters or CWT claims beyond those referenced in this document.
 
-The COSE protected header MUST include the `alg` (label 1) and `kid` (label 4) header parameters.
+The COSE protected header MUST include the `alg` (label 1), `kid` (label 4), and `typ` (label 16, see above) header parameters.
 The `alg` value identifies the signature algorithm.
 The `kid` value MUST equal the key identifier of the verification key as specified in {{key-formats}}.
-
-The protected header MAY include the `typ` (label 16, see {{!RFC9596}}) header parameter with the value `"application/adem"`.
-Where clear from context, the `typ` parameter MAY be omitted.
 
 The COSE unprotected header MUST be empty.
 
@@ -244,12 +279,15 @@ Endorsements are encoded as signed CWTs.
 Endorsements assert two statements: that a public key is affiliated with an organization, identified by an OI, and that this organization is authorized to issue emblems for their assets.
 An endorsement's CWT Claims Set includes the common claims defined in {{common-token-fields}} and the additional claims defined in the table below.
 
+Sometimes, endorsements are configured as trust anchors, which means that they can be validated without obtaining authentic public key material of the issuer.
+Endorsements are trust anchors whenever they include the `log` claim, and we further specify trust anchor configurations below.
+
 | Claim | Claim key | Status | Semantics | CBOR type |
 | ----- | --------- | ------ | --------- | --------- |
 | `sub` | 2 | RECOMMENDED | Endorsed organization, identified by their OI | tstr |
 | `cnf` | 8 | REQUIRED | Confirmation method for the subject's public key {{!RFC8747}}; further specified below | map |
 | `end` | `"end"` | REQUIRED | Endorsed key can endorse further | bool |
-| `log` | `"log"` | see below | Root key commitment | array of maps as below |
+| `log` | `"log"` | see below | Trust anchor configuration | array of maps as below |
 
 An endorsement's `cnf` claim MUST be a CBOR map that contains exactly the confirmation method `kid` (key 3) corresponding to the presenter's proof-of-possession key {{!RFC8747}}.
 The `kid` value MUST be a public key thumbprint as per {{key-formats}}.
@@ -262,10 +300,15 @@ An endorsement's `prp` claim constrains what kind of emblems the endorsed organi
 Each bit set in the `prp` claim gives the endorsed organization permission to issue the respective emblem.
 An emblem is thus *valid* with respect to an endorsement if the bit-wise AND of the endorsement's `prp` claim and the emblem's `prp` claim is equal to the emblem's `prp` claim.
 
+#### Trust Anchor Configuration {#trust-anchors}
+
 Endorsements MAY contain the `log` claim.
-If an endorsement was signed by a root key, it MUST include the `log` claim.
-The `log` claim identifies the CT logs that contain a binding certificate for the endorsement's verification key.
-The value of `log` is an array of CBOR maps, each of which identifies a CT log entry that commits to the organization's root signing key (see {{pk-distribution}}).
+If they do, they are a trust anchor.
+Trust anchor endorsements allow a validator to authenticate the endorsement's verification key out-of-band and check that the issuer controls their own OI (see {{ois}}).
+This is achieved by binding the endorsement's verification key to the issuer OI with a certificate stored in CT logs.
+
+The `log` claim identifies the CT logs that contain this binding certificate.
+The value of `log` is an array of CBOR maps, each of which identifies a CT log entry that stores a certificate committing to the endorsements's verification key as per {{pk-commitment}}.
 This standard supports log entries of both standard CT logs as specified in {{!RFC6962}} and tiled CT logs as specified in {{STATIC-CT}}.
 
 | Entry | Map key | Status | Semantics | CBOR type |
@@ -276,28 +319,6 @@ This standard supports log entries of both standard CT logs as specified in {{!R
 
 For logs implementing {{!RFC6962}}, a map in `log` MUST include the `hash` entry and MUST NOT include the `index` entry.
 For logs implementing {{STATIC-CT}}, a map in `log` MUST include the `index` entry and MUST NOT include the `hash` entry.
-
-# Public Key Commitment {#pk-distribution}
-
-Organizations must undeniably link some of their public keys to their OI, and we specify a public key commitment mechanism in this section to achieve that.
-Every public key an organization commits to in this way is a root public key.
-An organization MAY have multiple root public keys.
-For a root public key to be configured correctly, there MUST be an X.509 certificate that:
-
-* MUST NOT be revoked
-* MUST be logged in the Certificate Transparency logs {{!RFC6962}} {{STATIC-CT}}
-  * Note that log inclusion requires a valid certificate chain that leads to
-  one of the log's accepted root certificates. Clients are RECOMMENDED to verify
-  that this chain is valid and that none of the certificates along it have been
-  revoked.
-* MUST be valid for at least all the following domains while not considering wildcards in the certificate subject (`<OI>` is understood to be a placeholder for the domain name in the organization's OI):
-  * `<OI>`
-  * For the textual representation `<KID>` of the root public key's key identifier, as specified in {{key-formats}}: `<KID>.adem-configuration.<OI>`
-
-<!-- TODO: Transform into informative references -->
-We intentionally do not specify how clients should check a certificate's revocation status.
-It is RECOMMENDED that clients use offline revocation checks that are provided by major browser vendors, for example, [OneCRL or CRLite by Mozilla](https://wiki.mozilla.org/CA/Revocation_Checking_in_Firefox), or [CRLSet by Chrome](https://chromium.googlesource.com/playground/chromium-org-site/+/refs/heads/main/Home/chromium-security/crlsets.md).
-
 
 # Validation {#validation}
 
@@ -367,7 +388,7 @@ Algorithm:
 
 1. Discard all endorsements including an `iss` claim different to the emblem's `iss` claim.
 2. If either (a) no endorsements remain, or (b) the remaining endorsements do not form a linear chain, or (c) the top-most endorsement of that chain has no `log` protected header parameter, return `INVALID`.
-3. Verify the top-most endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-distribution}}.
+3. Verify the top-most endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-commitment}}.
 If verification fails, return `INVALID`.
 Otherwise, return `ORGANIZATIONAL`.
 
@@ -387,7 +408,7 @@ Algorithm:
     1. Verify that it endorses the top-most endorsement with the same `iss` claim as the emblem.
     2. Verify that it bears the claim `end=true`.
     3. Verify that the emblem is valid with regard to this endorsement.
-    4. Verify the endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-distribution}}.
+    4. Verify the endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-commitment}}.
     5. Should any of the aforementioned validation steps fail, discard this endorsement.
 3. If there are no endorsements remaining, return `INVALID` and the empty set of OIs.
 Otherwise, return `ENDORSED` and the set of all `iss` claims of the remaining endorsements.
@@ -398,7 +419,7 @@ Otherwise, return `ENDORSED` and the set of all `iss` claims of the remaining en
 
 Validators SHOULD NOT accept emblems resulting only in `SIGNED` without authenticating their verification keys out of band.
 In such cases, validators should aim to authenticate the respective public keys via other, out-of-band methods.
-Signed emblems are supported for cases of emergency where an emblem issuer is able to communicate one or more public keys, but might not be able to set up a signing infrastructure linking their assets to a root key.
+Signed emblems are supported for cases of emergency where an emblem issuer is able to distribute one or more public keys, but might not be able to set up a signing infrastructure linking their assets to their OI via a trust anchor endorsement.
 
 ## Accountability {#accountability}
 
@@ -412,7 +433,7 @@ Practically speaking, this implies that one can only go beyond pure public key a
 The constraints on well-configured OIs offer two beneficial security properties:
 
 * Organizations cannot equivocate their keys, i.e., they need to commit to a consistent set of keys.
-* Organizations cannot deny having used certain root public keys.
+* Organizations cannot deny having used keys for signing trust anchor endorsements.
 
 These properties stem from organizations needing to include a hash of their key in a TLS certificate, and consequently, in certificate transparency logs.
 
