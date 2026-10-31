@@ -410,7 +410,7 @@ Algorithm:
     4. Verify the endorsement's verification public key by using its `iss` claim and `log` claim as specified in {{pk-commitment}}.
     5. Should any of the aforementioned validation steps fail, discard this endorsement.
 2. If no endorsement passed the checks above, return `INVALID` and the empty set of OIs.
-Otherwise, return `ENDORSED` and the set of all `iss` claims of the remaining endorsements.
+Otherwise, return `ENDORSED` and the set of all `iss` claims of endorsements that passed the above checks.
 
 # Security Considerations
 
