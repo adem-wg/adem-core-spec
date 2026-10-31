@@ -185,7 +185,7 @@ Furthermore, endorsements can be configured as trust anchors for an issuer, whic
 To facilitate validation, tokens MUST include the `typ` (label 16, see {{!RFC9596}}) header parameter, which MUST be a string mediate value following the syntax of `adem-type` below.
 
 ~~~~
-adem-type = "application/adem+cwt; emblem=" ("0" / "1") [ " trust-anchor" ]
+adem-type = "application/adem+cwt; emblem=" ("0" / "1") [ "; trust-anchor=1" ]
 ~~~~
 
 The structured suffix `+cwt` indicates that tokens are encoded as CWTs {{STRUCT-SYNTAX}}.
@@ -256,7 +256,7 @@ Protected header:
 {
   / alg / 1: -36, / ES512 /
   / kid / 4: h'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-  / typ / 16: "application/adem"
+  / typ / 16: "application/adem+cwt; emblem=1"
 }
 ~~~~
 
@@ -387,8 +387,8 @@ The emblem includes the `iss` claim.
 Algorithm:
 
 1. Discard all endorsements including an `iss` claim different to the emblem's `iss` claim.
-2. If either (a) no endorsements remain, or (b) the remaining endorsements do not form a linear chain, or (c) the top-most endorsement of that chain has no `log` protected header parameter, return `INVALID`.
-3. Verify the top-most endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-commitment}}.
+2. If either (a) no endorsements remain, or (b) the remaining endorsements do not form a linear chain, or (c) the top-most endorsement of that chain has no `log` claim, return `INVALID`.
+3. Verify the top-most endorsement's verification public key by using its `iss` claim and `log` claim as specified in {{pk-commitment}}.
 If verification fails, return `INVALID`.
 Otherwise, return `ORGANIZATIONAL`.
 
@@ -403,14 +403,13 @@ Organizational emblem validation has been performed and did not return `INVALID`
 
 Algorithm:
 
-1. Discard all endorsements with an `iss` claim equal to the emblem's `iss` claim or with an undefined `iss` claim.
-2. For every endorsement:
+1. For all endorsements that contain an `iss` claim which is different to the emblem's `iss` claim:
     1. Verify that it endorses the top-most endorsement with the same `iss` claim as the emblem.
     2. Verify that it bears the claim `end=true`.
     3. Verify that the emblem is valid with regard to this endorsement.
-    4. Verify the endorsement's verification public key by using its `iss` claim and `log` header parameter as specified in {{pk-commitment}}.
+    4. Verify the endorsement's verification public key by using its `iss` claim and `log` claim as specified in {{pk-commitment}}.
     5. Should any of the aforementioned validation steps fail, discard this endorsement.
-3. If there are no endorsements remaining, return `INVALID` and the empty set of OIs.
+2. If no endorsement passed the checks above, return `INVALID` and the empty set of OIs.
 Otherwise, return `ENDORSED` and the set of all `iss` claims of the remaining endorsements.
 
 # Security Considerations
