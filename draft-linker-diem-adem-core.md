@@ -178,7 +178,7 @@ External additional authenticated data MUST be the zero-length byte string.
 The CWT Claims Set MUST be a CBOR map.
 Registered CWT claims use their integer claim keys from {{!RFC8392}}; claims defined by this document use the text-string claim keys shown below.
 
-### Token Types
+### Token Types {#token-types}
 
 There are two types of tokens: emblems and endorsements.
 Furthermore, endorsements can be configured as trust anchors for an issuer, which allows their validation without obtaining further authentic public key material.
@@ -335,12 +335,13 @@ Given a set of tokens and a set of public keys, validation takes the following s
 
 1. For every public key, compute its key identifier as described in {{key-formats}}.
 2. For every token, perform the following steps:
-    1. Verify the token's signature using the public key whose key identifier computed in the previous step matches the `kid` header parameter.
-    2. Verify the token's `nbf` and `exp` claims.
-    3. Should either of the aforementioned validation steps fail, discard this token.
-3. Identify the emblem among the remaining tokens.
-The emblem is the token containing an `assets` claim, and it MUST be uniquely defined.
-If there is not exactly one token containing an `assets` claim, return `INVALID`.
+    1. Verify the token's `typ` protected header parameter following {{token-types}}.
+    2. Verify the token's signature using the public key whose key identifier computed in the previous step matches the `kid` header parameter.
+    3. Verify the token's `nbf` and `exp` claims.
+    4. Should either of the aforementioned validation steps fail, discard this token.
+3. Identify the emblem among the remaining tokens by its `typ` protected header parameter.
+Verify that there is only one emblem and that it contains the `assets` claim.
+If this check fails, return `INVALID`.
 All other tokens are endorsements.
 4. Run the *signed emblem validation procedure* ({{signed-emblems}}; results in one of `SIGNED` or `INVALID`).
 5. If the previous procedure resulted in `INVALID` or the emblem does not include the `iss` claim, return the last validation procedure's result and the empty set of OIs.
@@ -352,9 +353,6 @@ Otherwise, return `SIGNED`, `ORGANIZATIONAL`, `ENDORSED`, and the OIs returned b
 
 # Algorithms
 
-Each procedure operates on its own copy of the validated token set.
-Discarding endorsements within a procedure does not remove them from the inputs to subsequent procedures.
-
 ## Signed Emblem Validation Procedure {#signed-emblems}
 
 Context:
@@ -365,7 +363,7 @@ Context:
 
 Algorithm:
 
-1. Discard all endorsements including an `iss` claim different to the emblem's `iss` claim.
+1. Ignore all endorsements including an `iss` claim different to the emblem's `iss` claim.
 An omitted `iss` claim is different to an included `iss` claim and equal to an omitted `iss` claim.
 2. If no endorsements remain, return `SIGNED`.
 Otherwise, verify that all endorsements form a consecutive chain where there is a unique root endorsement and the public key which was used to verify the emblem's signature is transitively endorsed by that root endorsement.
