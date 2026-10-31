@@ -127,7 +127,7 @@ We identify keys using key identifiers, which are 32-byte SHA-256 COSE Key Thumb
 To force computation and thus verification of key identifiers, COSE_Key structures SHOULD NOT contain the `kid` parameter (label 2).
 Implementations that encode key material MUST NOT include the `kid` parameter, but implementations consuming key material SHOULD accept and ignore the `kid` parameter.
 
-Key identifiers are encoded as a CBOR byte string when used as the COSE `kid` header parameter or as a CWT claim value.
+Key identifiers are encoded as a CBOR byte strings when used within CBOR objects.
 When a textual representation is required, key identifiers are encoded using base32 as specified in {{!RFC4648}}, in lowercase and without trailing `=` characters.
 
 # Tokens {#tokens}
@@ -247,16 +247,20 @@ An endorsement's CWT Claims Set includes the common claims defined in {{common-t
 | Claim | Claim key | Status | Semantics | CBOR type |
 | ----- | --------- | ------ | --------- | --------- |
 | `sub` | 2 | RECOMMENDED | Endorsed organization, identified by their OI | tstr |
-| `key` | `"key"` | REQUIRED | Endorsed organization's public key thumbprint | bstr |
+| `cnf` | 8 | REQUIRED | Confirmation method for the subject's public key {{!RFC8747}}; further specified below | map |
 | `end` | `"end"` | REQUIRED | Endorsed key can endorse further | bool |
 | `log` | `"log"` | see below | Root key commitment | array of maps as below |
+
+An endorsement's `cnf` claim MUST be a CBOR map that contains exactly the confirmation method `kid` (key 3) corresponding to the presenter's proof-of-possession key {{!RFC8747}}.
+The `kid` value MUST be a public key thumbprint as per {{key-formats}}.
+The endorsement's `sub` claim identifies the presenter.
+
+We say that an endorsement *endorses* a token if the endorsement's `cnf` claim contains the key identifier of the token's verification key, and its `sub` claim equals the token's `iss` claim.
+Note that the latter includes the possibility of both `sub` and `iss` being undefined.
 
 An endorsement's `prp` claim constrains what kind of emblems the endorsed organization may issue.
 Each bit set in the `prp` claim gives the endorsed organization permission to issue the respective emblem.
 An emblem is thus *valid* with respect to an endorsement if the bit-wise AND of the endorsement's `prp` claim and the emblem's `prp` claim is equal to the emblem's `prp` claim.
-
-We say that an endorsement *endorses* a token if its `key` claim equals the key identifier of the token's verification key, and its `sub` claim equals the token's `iss` claim.
-Note that the latter includes the possibility of both `sub` and `iss` being undefined.
 
 Endorsements MAY contain the `log` claim.
 If an endorsement was signed by a root key, it MUST include the `log` claim.
