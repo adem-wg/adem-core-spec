@@ -385,8 +385,8 @@ The emblem includes the `iss` claim.
 
 Algorithm:
 
-1. Discard all endorsements including an `iss` claim different to the emblem's `iss` claim.
-2. If either (a) no endorsements remain, or (b) the remaining endorsements do not form a linear chain, or (c) the top-most endorsement of that chain has no `log` claim, return `INVALID`.
+1. Consider all endorsements including an `iss` claim equal to the emblem's `iss` claim.
+2. If either (a) there are no such endorsements, or (b) these endorsements do not form a linear chain, or (c) the top-most endorsement of that chain has no `log` claim, return `INVALID`.
 3. Verify the top-most endorsement's verification public key by using its `iss` claim and `log` claim as specified in {{pk-commitment}}.
 If verification fails, return `INVALID`.
 Otherwise, return `ORGANIZATIONAL`.
